@@ -1,0 +1,83 @@
+import { Link, useLocation } from 'react-router-dom'
+import { House, MapPin, Camera, Sparkle, CalendarDots, Gear } from '@phosphor-icons/react'
+import { cn } from '@/lib/utils'
+
+const routes = [
+  { path: '/', label: 'Dashboard', icon: House },
+  { path: '/explore', label: 'Explore', icon: MapPin },
+  { path: '/journal', label: 'Journal', icon: Camera },
+  { path: '/ai-planner', label: 'AI Planner', icon: Sparkle },
+  { path: '/trips', label: 'Trips', icon: CalendarDots },
+  { path: '/settings', label: 'Settings', icon: Gear },
+]
+
+export function Navigation() {
+  const location = useLocation()
+
+  return (
+    <header className="glass-surface sticky top-0 z-50 border-b">
+      <nav className="container mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="text-2xl font-bold text-primary">
+            TT Travels
+          </Link>
+
+          <div className="hidden md:flex items-center gap-1">
+            {routes.map((route) => {
+              const Icon = route.icon
+              const isActive = location.pathname === route.path
+              
+              return (
+                <Link
+                  key={route.path}
+                  to={route.path}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200',
+                    isActive
+                      ? 'bg-accent text-accent-foreground font-medium'
+                      : 'text-foreground hover:bg-muted'
+                  )}
+                >
+                  <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
+                  <span>{route.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+
+          <div className="md:hidden">
+            <Link
+              to="/settings"
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+            >
+              <Gear size={24} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="md:hidden flex items-center gap-1 mt-4 overflow-x-auto pb-2">
+          {routes.slice(0, -1).map((route) => {
+            const Icon = route.icon
+            const isActive = location.pathname === route.path
+            
+            return (
+              <Link
+                key={route.path}
+                to={route.path}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200',
+                  isActive
+                    ? 'bg-accent text-accent-foreground font-medium'
+                    : 'text-foreground hover:bg-muted'
+                )}
+              >
+                <Icon size={18} weight={isActive ? 'fill' : 'regular'} />
+                <span className="text-sm">{route.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+    </header>
+  )
+}
