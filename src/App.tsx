@@ -22,9 +22,7 @@ function AppContent() {
   
   return (
     <>
-      <a href="#main-content" className="skip-link">
-        Skip to content
-      </a>
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <div className="min-h-screen bg-background">
         <Show when="signed-in">
           <Navigation />
@@ -51,7 +49,7 @@ function AppContent() {
       </div>
       <Toaster />
     </>
-  )
+  );
 }
 
 function App() {
