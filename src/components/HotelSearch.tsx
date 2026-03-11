@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { searchHotels, MissingApiKeyError } from '@/lib/api'
 import type { HotelOffer, Trip, SavedHotel } from '@/lib/types'
 import { toast } from 'sonner'
-import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight } from '@phosphor-icons/react'
+import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight, House } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format, differenceInDays } from 'date-fns'
 import { useKV } from '@github/spark/hooks'
@@ -16,8 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+type Provider = 'hotels' | 'airbnb'
 
 export function HotelSearch() {
+  const [provider, setProvider] = useState<Provider>('hotels')
   const [cityCode, setCityCode] = useState('')
   const [checkInDate, setCheckInDate] = useState('')
   const [checkOutDate, setCheckOutDate] = useState('')
@@ -55,15 +59,15 @@ export function HotelSearch() {
       setResults(availableOffers)
       
       if (availableOffers.length === 0) {
-        toast.info('No hotels found for your search')
+        toast.info(`No ${provider === 'hotels' ? 'hotels' : 'Airbnb listings'} found for your search`)
       } else {
-        toast.success(`Found ${availableOffers.length} hotels`)
+        toast.success(`Found ${availableOffers.length} ${provider === 'hotels' ? 'hotels' : 'Airbnb listings'}`)
       }
     } catch (error) {
       if (error instanceof MissingApiKeyError) {
         setShowSetupModal(true)
       } else {
-        toast.error(error instanceof Error ? error.message : 'Failed to search hotels')
+        toast.error(error instanceof Error ? error.message : `Failed to search ${provider === 'hotels' ? 'hotels' : 'Airbnb listings'}`)
       }
     } finally {
       setLoading(false)
@@ -90,7 +94,7 @@ export function HotelSearch() {
       })
     )
 
-    toast.success('Hotel saved to trip!')
+    toast.success(`${provider === 'hotels' ? 'Hotel' : 'Airbnb listing'} saved to trip!`)
     setShowTripDialog(false)
     setSelectedHotel(null)
   }
@@ -102,6 +106,21 @@ export function HotelSearch() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-center">
+        <Tabs value={provider} onValueChange={(value) => setProvider(value as Provider)} className="w-auto">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="hotels" className="gap-2">
+              <Buildings size={18} weight="fill" />
+              Hotels
+            </TabsTrigger>
+            <TabsTrigger value="airbnb" className="gap-2">
+              <House size={18} weight="fill" />
+              Airbnb
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="city-code">City (IATA Code)</Label>
@@ -156,14 +175,16 @@ export function HotelSearch() {
             size="lg"
           >
             <MagnifyingGlass size={20} weight="bold" />
-            {loading ? 'Searching...' : 'Search Hotels'}
+            {loading ? 'Searching...' : `Search ${provider === 'hotels' ? 'Hotels' : 'Airbnb'}`}
           </Button>
         </div>
       </div>
 
       {results.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Available Hotels ({results.length})</h3>
+          <h3 className="text-xl font-semibold">
+            Available {provider === 'hotels' ? 'Hotels' : 'Airbnb Listings'} ({results.length})
+          </h3>
           <div className="grid gap-4">
             {results.map((offer) => {
               const hotel = offer.hotel
@@ -185,7 +206,11 @@ export function HotelSearch() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 space-y-3">
                       <div className="flex items-start gap-4">
-                        <Buildings size={32} weight="fill" className="text-primary mt-1" />
+                        {provider === 'hotels' ? (
+                          <Buildings size={32} weight="fill" className="text-primary mt-1" />
+                        ) : (
+                          <House size={32} weight="fill" className="text-primary mt-1" />
+                        )}
                         <div className="flex-1">
                           <h4 className="text-lg font-semibold">{hotel.name}</h4>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -210,7 +235,7 @@ export function HotelSearch() {
                           <span className="font-medium">Check-out:</span> {format(new Date(bestOffer.checkOutDate), 'PPP')}
                         </div>
                         <div className="text-muted-foreground">
-                          <span className="font-medium">Room:</span> {bestOffer.room.type}
+                          <span className="font-medium">{provider === 'hotels' ? 'Room' : 'Property'}:</span> {bestOffer.room.type}
                           {bestOffer.room.typeEstimated && bestOffer.room.typeEstimated.beds && (
                             <span> • {bestOffer.room.typeEstimated.beds} bed(s)</span>
                           )}
@@ -258,15 +283,15 @@ export function HotelSearch() {
       <Dialog open={showTripDialog} onOpenChange={setShowTripDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save Hotel to Trip</DialogTitle>
+            <DialogTitle>Save {provider === 'hotels' ? 'Hotel' : 'Airbnb'} to Trip</DialogTitle>
             <DialogDescription>
-              Choose which trip to add this hotel to
+              Choose which trip to add this {provider === 'hotels' ? 'hotel' : 'listing'} to
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 py-4">
             {(trips || []).length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No trips created yet. Create a trip first to save hotels.
+                No trips created yet. Create a trip first to save {provider === 'hotels' ? 'hotels' : 'Airbnb listings'}.
               </p>
             ) : (
               (trips || []).map((trip) => (
