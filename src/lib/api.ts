@@ -561,3 +561,102 @@ export function isIntegrationConfigured(integration: Integration): boolean {
 
   return false
 }
+
+export interface WeatherActivity {
+  name: string
+  description: string
+  category: string
+  suitability: 'excellent' | 'good' | 'fair'
+  weatherReason: string
+  tips?: string[]
+}
+
+export async function generateWeatherActivities(
+  destination: string,
+  temperature: number,
+  weatherCondition: string,
+  unit: string
+): Promise<WeatherActivity[]> {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+
+  if (!apiKey) {
+    throw new MissingApiKeyError('OpenAI API key is not configured')
+  }
+
+  const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
+
+  const systemPrompt = 'You are a knowledgeable travel expert who recommends activities based on current weather conditions and destinations. Provide practical, specific, and localized recommendations that consider both weather suitability and the unique character of each destination. Return ONLY valid JSON.'
+
+  const userPrompt = `Generate 6-8 weather-appropriate activity recommendations for ${destination} given the current conditions:
+- Temperature: ${temperature}${unit}
+- Weather: ${weatherCondition}
+
+Provide a diverse mix of activities across categories: Indoor, Outdoor, Cultural, Food & Dining, Entertainment, Nature, Shopping, and Relaxation.
+
+For each activity:
+1. Consider how the current weather affects the experience
+2. Rate suitability as "excellent", "good", or "fair" based on weather conditions
+3. Explain WHY this activity is recommended given the weather
+4. Include 2-3 practical tips specific to the destination and weather
+
+Return ONLY a JSON object in this exact format:
+{
+  "activities": [
+    {
+      "name": "Visit the Louvre Museum",
+      "description": "Explore world-class art collections in climate-controlled galleries spanning 72,735 square meters",
+      "category": "Indoor",
+      "suitability": "excellent",
+      "weatherReason": "Perfect indoor activity for rainy weather - stay dry while enjoying art",
+      "tips": ["Book timed entry online to skip lines", "Visit the Denon wing first for Mona Lisa", "Wear comfortable shoes for extensive walking"]
+    }
+  ]
+}
+
+Be specific to ${destination} - mention actual landmarks, neighborhoods, and local favorites. Consider the weather when rating suitability.`
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
+        response_format: { type: 'json_object' },
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const content = data.choices[0]?.message?.content?.trim()
+
+    if (!content) {
+      throw new Error('No activity recommendations generated')
+    }
+
+    const parsed = JSON.parse(content)
+    const activities = parsed.activities || []
+
+    return activities as WeatherActivity[]
+  } catch (error) {
+    if (error instanceof MissingApiKeyError) {
+      throw error
+    }
+    throw new Error(`Failed to generate activity recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}

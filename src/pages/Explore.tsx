@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { MapPin, ThermometerSimple, Warning } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ActivityRecommendations } from '@/components/ActivityRecommendations'
 import { fetchWeather } from '@/lib/api'
 import type { Coordinates, WeatherData } from '@/lib/types'
 
 export function Explore() {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null)
   const [weather, setWeather] = useState<WeatherData | null>(null)
+  const [weatherCondition, setWeatherCondition] = useState<string>('clear')
+  const [destination, setDestination] = useState<string>('your location')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,8 +29,53 @@ export function Explore() {
               ? (JSON.parse(settings).temperatureUnit as 'celsius' | 'fahrenheit')
               : 'celsius'
 
-            const weatherData = await fetchWeather(coords.lat, coords.lng, unit)
-            setWeather(weatherData)
+            const weatherResponse = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current_weather=true&temperature_unit=${unit === 'celsius' ? 'celsius' : 'fahrenheit'}`
+            )
+            const weatherData = await weatherResponse.json()
+            const weatherCode = weatherData.current_weather?.weathercode || 0
+
+            const weatherConditions: Record<number, string> = {
+              0: 'clear',
+              1: 'mainly clear',
+              2: 'partly cloudy',
+              3: 'overcast',
+              45: 'foggy',
+              48: 'foggy',
+              51: 'light drizzle',
+              53: 'moderate drizzle',
+              55: 'dense drizzle',
+              61: 'slight rain',
+              63: 'moderate rain',
+              65: 'heavy rain',
+              71: 'slight snow',
+              73: 'moderate snow',
+              75: 'heavy snow',
+              77: 'snow grains',
+              80: 'slight rain showers',
+              81: 'moderate rain showers',
+              82: 'violent rain showers',
+              85: 'slight snow showers',
+              86: 'heavy snow showers',
+              95: 'thunderstorm',
+              96: 'thunderstorm with hail',
+              99: 'thunderstorm with hail',
+            }
+
+            setWeatherCondition(weatherConditions[weatherCode] || 'varied')
+            setWeather({
+              main: {
+                temp: weatherData.current_weather?.temperature || 0,
+              },
+              unit: unit === 'celsius' ? '°C' : '°F',
+            })
+
+            const geocodeResponse = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`
+            )
+            const geocodeData = await geocodeResponse.json()
+            const city = geocodeData.address?.city || geocodeData.address?.town || geocodeData.address?.village || geocodeData.address?.county || 'your location'
+            setDestination(city)
           } catch (err) {
             setError('Failed to fetch weather data')
           } finally {
@@ -129,6 +177,15 @@ export function Explore() {
               </div>
             </CardContent>
           </Card>
+
+          {weather && (
+            <ActivityRecommendations
+              destination={destination}
+              temperature={weather.main.temp}
+              weatherCondition={weatherCondition}
+              unit={weather.unit}
+            />
+          )}
         </div>
       )}
     </div>

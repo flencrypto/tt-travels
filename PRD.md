@@ -42,11 +42,11 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Success criteria**: Returns well-formatted, highly personalized itinerary in <10 seconds with proper error handling, API key validation, and itinerary reflects all selected preferences accurately. Packing lists include weather-specific items with badges and explanations based on current destination weather conditions fetched from Open-Meteo and geocoding via OpenStreetMap
 
 ### Location Exploration with Weather
-- **Functionality**: Request geolocation, display map centered on user, fetch and show current weather with unit preferences
-- **Purpose**: Help users explore nearby areas and check current conditions for trip planning
+- **Functionality**: Request geolocation, display map centered on user, fetch and show current weather with unit preferences, and generate AI-powered destination-specific activity recommendations based on real-time weather conditions
+- **Purpose**: Help users explore nearby areas, check current conditions, and get personalized activity suggestions optimized for the weather
 - **Trigger**: Navigate to Explore page, browser requests location permission
-- **Progression**: Request geolocation → store coordinates → fetch weather from Open-Meteo → render OpenStreetMap iframe → display temperature with user's preferred unit
-- **Success criteria**: Accurate location detection, weather display within 2 seconds, proper metric/imperial conversion
+- **Progression**: Request geolocation → store coordinates → fetch weather from Open-Meteo with condition codes → reverse geocode location to get city name → render OpenStreetMap iframe → display temperature with user's preferred unit → automatically generate 6-8 weather-appropriate activity recommendations using OpenAI → display activities with category badges, suitability ratings, weather reasons, and practical tips → option to refresh recommendations
+- **Success criteria**: Accurate location detection, weather display within 2 seconds, proper metric/imperial conversion, activity recommendations generated within 10 seconds, activities are diverse across categories (Indoor, Outdoor, Cultural, Food & Dining, Entertainment, Nature, Shopping, Relaxation), suitability ratings (excellent/good/fair) accurately reflect weather conditions, specific destination landmarks and local favorites mentioned in recommendations
 
 ### Trip Calendar/Manager
 - **Functionality**: CRUD interface for saving trips with name, destination, start/end dates
@@ -81,12 +81,14 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Missing API Keys**: Setup modal with clear instructions when OpenAI or Amadeus keys are not configured
 - **Geolocation Denied**: Fallback message explaining why location is needed for weather/map features
 - **Offline/Network Errors**: Graceful error messages for API failures with retry options
-- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, no itinerary generated, no booking results found, or no price data available
+- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, no itinerary generated, no booking results found, no price data available, or no activity recommendations generated
 - **Invalid Form Input**: Field validation with clear error messages for trip planning, settings, and booking search forms
 - **Browser Compatibility**: Graceful degradation for older browsers that don't support modern geolocation APIs
 - **Invalid Airport/City Codes**: Clear error messages when IATA codes are not recognized by Amadeus API
 - **Date Validation**: Prevent past dates and ensure check-out/return dates are after check-in/departure dates
 - **Price Comparison Failures**: Handle partial data when some dates don't return results, show only available data with clear indication of gaps
+- **Activity Generation Failures**: Display retry button when activity recommendations fail to generate, show proper error messages for API rate limits or failures
+- **Weather Data Unavailable**: Handle cases when weather API is unavailable or location cannot be geocoded, still show map and location info
 
 ## Design Direction
 
@@ -163,7 +165,7 @@ Animations should enhance the sense of exploration and smooth transitions betwee
 
 **Icon Selection**: Phosphor icons throughout
 - MapPin for location/explore
-- Sparkle for AI planner
+- Sparkle for AI planner and activity generation
 - Calendar for trips
 - Camera for journal
 - Gear for settings
@@ -172,6 +174,10 @@ Animations should enhance the sense of exploration and smooth transitions betwee
 - Check for success confirmation
 - ChartLine for price trends and analytics
 - HeartStraight for saving favorites
+- ThermometerSimple for weather/temperature
+- Sun, CloudRain, Snowflake for weather condition icons
+- MapTrifold for map and activities
+- Info for information and tips
 
 **Spacing**: 
 - Page padding: px-6 md:px-12
