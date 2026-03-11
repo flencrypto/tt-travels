@@ -1,6 +1,6 @@
 # TT Travels - AI-Powered Travel Planning Platform
 
-A comprehensive travel command center combining AI-powered itinerary generation, location exploration with weather, trip management, and personal travel journaling.
+A comprehensive travel command center combining AI-powered itinerary generation, real-time flight and hotel booking, location exploration with weather, trip management, and personal travel journaling.
 
 **Experience Qualities**:
 1. **Confident** - Bold visual design with glass morphism and smooth navigation instills trust in the platform's AI capabilities
@@ -9,7 +9,7 @@ A comprehensive travel command center combining AI-powered itinerary generation,
 
 **Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
 
-This is a sophisticated multi-feature application with route-based navigation, external API integrations (OpenAI, Open-Meteo, OpenStreetMap), browser API usage (geolocation), local persistence, AI generation, and multiple interconnected planning modules that work together as a unified travel platform.
+This is a sophisticated multi-feature application with route-based navigation, external API integrations (OpenAI, Amadeus, Open-Meteo, OpenStreetMap), browser API usage (geolocation), local persistence, AI generation, real-time booking search, and multiple interconnected planning modules that work together as a unified travel platform.
 
 ## Essential Features
 
@@ -19,6 +19,13 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Trigger**: Default landing route (/)
 - **Progression**: User lands on dashboard → views KPI metrics → selects quick action or feature card → navigates to specific module
 - **Success criteria**: Users can quickly understand platform value and access any feature within 2 clicks
+
+### Flight and Hotel Booking
+- **Functionality**: Real-time search for flights and hotels using Amadeus Travel API
+- **Purpose**: Enable users to search and compare flight and hotel options directly within the platform
+- **Trigger**: Navigate to Bookings page, select Flights or Hotels tab, fill search form, click search
+- **Progression**: Enter search criteria (origin/destination, dates, passengers) → validate required fields → authenticate with Amadeus API → fetch real-time offers → display results with pricing and details → filter/sort results
+- **Success criteria**: Returns up to 10 flight/hotel offers within 5 seconds, displays pricing, duration, stops, hotel ratings, proper error handling for missing API credentials or search errors
 
 ### AI Trip Planner
 - **Functionality**: Generate personalized itineraries using OpenAI based on destination input
@@ -64,12 +71,14 @@ This is a sophisticated multi-feature application with route-based navigation, e
 
 ## Edge Case Handling
 
-- **Missing API Keys**: Setup modal with clear instructions when OpenAI key is not configured
+- **Missing API Keys**: Setup modal with clear instructions when OpenAI or Amadeus keys are not configured
 - **Geolocation Denied**: Fallback message explaining why location is needed for weather/map features
 - **Offline/Network Errors**: Graceful error messages for API failures with retry options
-- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, or no itinerary generated yet
-- **Invalid Form Input**: Field validation with clear error messages for trip planning and settings
+- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, no itinerary generated, or no booking results found
+- **Invalid Form Input**: Field validation with clear error messages for trip planning, settings, and booking search forms
 - **Browser Compatibility**: Graceful degradation for older browsers that don't support modern geolocation APIs
+- **Invalid Airport/City Codes**: Clear error messages when IATA codes are not recognized by Amadeus API
+- **Date Validation**: Prevent past dates and ensure check-out/return dates are after check-in/departure dates
 
 ## Design Direction
 

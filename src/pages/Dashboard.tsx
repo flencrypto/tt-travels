@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe } from '@phosphor-icons/react'
+import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe, Ticket } from '@phosphor-icons/react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -20,18 +20,25 @@ export function Dashboard() {
       color: 'bg-accent/10 text-accent',
     },
     {
+      icon: Ticket,
+      title: 'Book Travel',
+      description: 'Search flights and hotels',
+      to: '/bookings',
+      color: 'bg-primary/10 text-primary',
+    },
+    {
       icon: MapPin,
       title: 'Explore Nearby',
       description: 'Discover locations around you',
       to: '/explore',
-      color: 'bg-primary/10 text-primary',
+      color: 'bg-secondary/10 text-secondary',
     },
     {
       icon: CalendarDots,
       title: 'Plan Trip',
       description: 'Schedule your next adventure',
       to: '/trips',
-      color: 'bg-secondary/10 text-secondary',
+      color: 'bg-muted/40 text-foreground',
     },
   ]
 

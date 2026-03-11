@@ -7,6 +7,7 @@ import { Journal } from './pages/Journal'
 import { Trips } from './pages/Trips'
 import { Settings } from './pages/Settings'
 import { Setup } from './pages/Setup'
+import { Bookings } from './pages/Bookings'
 import { Toaster } from './components/ui/sonner'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/bookings" element={<Bookings />} />
             <Route path="/ai-planner" element={<AIPlanner />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/trips" element={<Trips />} />

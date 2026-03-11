@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, MapPin, Camera, Sparkle, CalendarDots, Gear } from '@phosphor-icons/react'
+import { House, MapPin, Camera, Sparkle, CalendarDots, Gear, Ticket } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 const routes = [
   { path: '/', label: 'Dashboard', icon: House },
   { path: '/explore', label: 'Explore', icon: MapPin },
+  { path: '/bookings', label: 'Bookings', icon: Ticket },
   { path: '/journal', label: 'Journal', icon: Camera },
   { path: '/ai-planner', label: 'AI Planner', icon: Sparkle },
   { path: '/trips', label: 'Trips', icon: CalendarDots },
