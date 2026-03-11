@@ -11,8 +11,11 @@ import { Setup } from './pages/Setup'
 import { Bookings } from './pages/Bookings'
 import { DestinationDetail } from './pages/DestinationDetail'
 import { Toaster } from './components/ui/sonner'
+import { useClerkSync } from './hooks/use-clerk-sync'
 
 function App() {
+  useClerkSync()
+  
   return (
     <BrowserRouter>
       <a href="#main-content" className="skip-link">

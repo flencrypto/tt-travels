@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/hooks/use-theme'
 import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
+import { SyncStatusIndicator } from '@/components/SyncStatusIndicator'
 
 const routes = [
   { path: '/', label: 'Dashboard', icon: House },
@@ -61,6 +62,8 @@ export function Navigation() {
                 <Moon size={20} weight="fill" />
               )}
             </Button>
+            
+            <SyncStatusIndicator />
             
             <Show when="signed-out">
               <div className="flex items-center gap-2 ml-2">

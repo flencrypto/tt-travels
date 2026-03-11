@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning } from '@phosphor-icons/react'
+import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning, CloudCheck, Cloud } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { useKV } from '@github/spark/hooks'
 import { useTheme } from '@/hooks/use-theme'
+import { useClerkSync } from '@/hooks/use-clerk-sync'
+import { useUser } from '@clerk/react'
 import { toast } from 'sonner'
 import type { Settings, APIKeys, APIValidationResult } from '@/lib/types'
 import { 
@@ -27,6 +29,8 @@ export function Settings() {
   })
   const [apiKeys, setApiKeys] = useKV<APIKeys>('tt-travels-api-keys', {})
   const { theme, toggleTheme } = useTheme()
+  const { isSynced, isSignedIn } = useClerkSync()
+  const { user } = useUser()
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
   const [validationResults, setValidationResults] = useState<{
     amadeus?: APIValidationResult
