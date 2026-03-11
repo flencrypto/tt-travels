@@ -3,11 +3,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { searchFlights, MissingApiKeyError } from '@/lib/api'
-import type { FlightOffer } from '@/lib/types'
+import type { FlightOffer, Trip, SavedFlight } from '@/lib/types'
 import { toast } from 'sonner'
-import { AirplaneTilt, MagnifyingGlass, Clock, CurrencyDollar } from '@phosphor-icons/react'
+import { AirplaneTilt, MagnifyingGlass, Clock, CurrencyDollar, Heart, HeartStraight } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format } from 'date-fns'
+import { useKV } from '@github/spark/hooks'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export function FlightSearch() {
   const [origin, setOrigin] = useState('')
@@ -18,6 +26,9 @@ export function FlightSearch() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<FlightOffer[]>([])
   const [showSetupModal, setShowSetupModal] = useState(false)
+  const [trips, setTrips] = useKV<Trip[]>('trips', [])
+  const [showTripDialog, setShowTripDialog] = useState(false)
+  const [selectedFlight, setSelectedFlight] = useState<FlightOffer | null>(null)
 
   const handleSearch = async () => {
     if (!origin || !destination || !departureDate) {
@@ -61,6 +72,36 @@ export function FlightSearch() {
     const hours = match[1] ? match[1].replace('H', 'h ') : ''
     const minutes = match[2] ? match[2].replace('M', 'm') : ''
     return hours + minutes
+  }
+
+  const handleSaveToTrip = (tripId: string) => {
+    if (!selectedFlight) return
+
+    setTrips((currentTrips) => 
+      (currentTrips || []).map((trip) => {
+        if (trip.id === tripId) {
+          const savedFlight: SavedFlight = {
+            id: `flight-${Date.now()}`,
+            flightOffer: selectedFlight,
+            savedAt: new Date().toISOString(),
+          }
+          return {
+            ...trip,
+            savedFlights: [...(trip.savedFlights || []), savedFlight],
+          }
+        }
+        return trip
+      })
+    )
+
+    toast.success('Flight saved to trip!')
+    setShowTripDialog(false)
+    setSelectedFlight(null)
+  }
+
+  const openSaveDialog = (flight: FlightOffer) => {
+    setSelectedFlight(flight)
+    setShowTripDialog(true)
   }
 
   return (
@@ -189,6 +230,15 @@ export function FlightSearch() {
                       <div className="text-xs text-muted-foreground">
                         {offer.price.currency}
                       </div>
+                      <Button
+                        onClick={() => openSaveDialog(offer)}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 mt-2"
+                      >
+                        <HeartStraight size={16} weight="fill" />
+                        Save to Trip
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -197,6 +247,40 @@ export function FlightSearch() {
           </div>
         </div>
       )}
+
+      <Dialog open={showTripDialog} onOpenChange={setShowTripDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Flight to Trip</DialogTitle>
+            <DialogDescription>
+              Choose which trip to add this flight to
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            {(trips || []).length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No trips created yet. Create a trip first to save flights.
+              </p>
+            ) : (
+              (trips || []).map((trip) => (
+                <Button
+                  key={trip.id}
+                  onClick={() => handleSaveToTrip(trip.id)}
+                  variant="outline"
+                  className="w-full justify-start"
+                >
+                  <div className="text-left">
+                    <div className="font-semibold">{trip.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {trip.destination} • {format(new Date(trip.startDate), 'MMM d')} - {format(new Date(trip.endDate), 'MMM d, yyyy')}
+                    </div>
+                  </div>
+                </Button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <SetupModal open={showSetupModal} onOpenChange={setShowSetupModal} />
     </div>

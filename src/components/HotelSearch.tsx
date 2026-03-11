@@ -3,11 +3,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { searchHotels, MissingApiKeyError } from '@/lib/api'
-import type { HotelOffer } from '@/lib/types'
+import type { HotelOffer, Trip, SavedHotel } from '@/lib/types'
 import { toast } from 'sonner'
-import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star } from '@phosphor-icons/react'
+import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format, differenceInDays } from 'date-fns'
+import { useKV } from '@github/spark/hooks'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export function HotelSearch() {
   const [cityCode, setCityCode] = useState('')
@@ -17,6 +25,9 @@ export function HotelSearch() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<HotelOffer[]>([])
   const [showSetupModal, setShowSetupModal] = useState(false)
+  const [trips, setTrips] = useKV<Trip[]>('trips', [])
+  const [showTripDialog, setShowTripDialog] = useState(false)
+  const [selectedHotel, setSelectedHotel] = useState<HotelOffer | null>(null)
 
   const handleSearch = async () => {
     if (!cityCode || !checkInDate || !checkOutDate) {
@@ -57,6 +68,36 @@ export function HotelSearch() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSaveToTrip = (tripId: string) => {
+    if (!selectedHotel) return
+
+    setTrips((currentTrips) => 
+      (currentTrips || []).map((trip) => {
+        if (trip.id === tripId) {
+          const savedHotel: SavedHotel = {
+            id: `hotel-${Date.now()}`,
+            hotelOffer: selectedHotel,
+            savedAt: new Date().toISOString(),
+          }
+          return {
+            ...trip,
+            savedHotels: [...(trip.savedHotels || []), savedHotel],
+          }
+        }
+        return trip
+      })
+    )
+
+    toast.success('Hotel saved to trip!')
+    setShowTripDialog(false)
+    setSelectedHotel(null)
+  }
+
+  const openSaveDialog = (hotel: HotelOffer) => {
+    setSelectedHotel(hotel)
+    setShowTripDialog(true)
   }
 
   return (
@@ -196,6 +237,15 @@ export function HotelSearch() {
                       <div className="text-xs text-muted-foreground">
                         {nights} night{nights > 1 ? 's' : ''}
                       </div>
+                      <Button
+                        onClick={() => openSaveDialog(offer)}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 mt-2"
+                      >
+                        <HeartStraight size={16} weight="fill" />
+                        Save to Trip
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -204,6 +254,40 @@ export function HotelSearch() {
           </div>
         </div>
       )}
+
+      <Dialog open={showTripDialog} onOpenChange={setShowTripDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Hotel to Trip</DialogTitle>
+            <DialogDescription>
+              Choose which trip to add this hotel to
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            {(trips || []).length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No trips created yet. Create a trip first to save hotels.
+              </p>
+            ) : (
+              (trips || []).map((trip) => (
+                <Button
+                  key={trip.id}
+                  onClick={() => handleSaveToTrip(trip.id)}
+                  variant="outline"
+                  className="w-full justify-start"
+                >
+                  <div className="text-left">
+                    <div className="font-semibold">{trip.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {trip.destination} • {format(new Date(trip.startDate), 'MMM d')} - {format(new Date(trip.endDate), 'MMM d, yyyy')}
+                    </div>
+                  </div>
+                </Button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <SetupModal open={showSetupModal} onOpenChange={setShowSetupModal} />
     </div>

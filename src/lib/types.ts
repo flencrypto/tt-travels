@@ -1,9 +1,23 @@
+export interface SavedFlight {
+  id: string
+  flightOffer: FlightOffer
+  savedAt: string
+}
+
+export interface SavedHotel {
+  id: string
+  hotelOffer: HotelOffer
+  savedAt: string
+}
+
 export interface Trip {
   id: string
   name: string
   destination: string
   startDate: string
   endDate: string
+  savedFlights?: SavedFlight[]
+  savedHotels?: SavedHotel[]
 }
 
 export interface Settings {
