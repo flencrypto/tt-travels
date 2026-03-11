@@ -53,7 +53,9 @@ Visit `http://localhost:5173` and sign in to start planning! 🎉
 ## 📖 Documentation
 
 - 📋 [PRD.md](./PRD.md) - Product requirements and feature specifications
-- 🔐 [CLERK_SETUP.md](./CLERK_SETUP.md) - Authentication setup guide
+- 🔐 [CLERK_SETUP.md](./CLERK_SETUP.md) - Complete authentication setup guide with OAuth
+- 🐛 [QUICK_DEBUG.md](./QUICK_DEBUG.md) - **START HERE** for troubleshooting
+- ✅ [DEBUG_CHECKLIST.md](./DEBUG_CHECKLIST.md) - Comprehensive debugging guide
 - 🔒 [SECURITY.md](./SECURITY.md) - Security policies and guidelines
 
 ## 🎨 Design Philosophy
@@ -83,13 +85,40 @@ src/
 
 ## 🐛 Troubleshooting
 
-### Authentication Issues
-See [CLERK_SETUP.md](./CLERK_SETUP.md#-troubleshooting) for detailed solutions.
+**Having issues?** → Start with [QUICK_DEBUG.md](./QUICK_DEBUG.md) for immediate help!
 
-### Environment Variables Not Loading
+### Common Quick Fixes
+
+#### Authentication Not Working
+1. Verify Clerk key in `.env.local` starts with `pk_test_`
+2. Restart dev server: `Ctrl+C` then `npm run dev`
+3. Hard refresh browser: `Ctrl+Shift+R`
+4. See [CLERK_SETUP.md](./CLERK_SETUP.md#-troubleshooting-common-issues) for detailed solutions
+
+#### OAuth Providers Missing (Google/GitHub)
+1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
+2. Navigate: User & Authentication → Social Connections
+3. Toggle Google and/or GitHub to ON
+4. Click Save and wait 60 seconds
+5. Refresh your app
+
+#### Environment Variables Not Loading
 - Ensure variables start with `VITE_` prefix
-- Restart dev server after changes to `.env.local`
+- File must be named `.env.local` in project root
+- **Restart dev server** after any changes to `.env.local`
 - Clear browser cache if issues persist
+
+### Detailed Debugging Guides
+
+- **[QUICK_DEBUG.md](./QUICK_DEBUG.md)** - 5-minute quick fixes for common issues
+- **[DEBUG_CHECKLIST.md](./DEBUG_CHECKLIST.md)** - Comprehensive checklist for all features
+- **[CLERK_SETUP.md](./CLERK_SETUP.md)** - Complete auth setup with troubleshooting
+
+**90% of issues are fixed by:**
+1. Checking browser console (F12) for errors
+2. Restarting the dev server
+3. Verifying Clerk key in `.env.local`
+4. Hard refreshing the browser
 
 ## 📄 License
 
