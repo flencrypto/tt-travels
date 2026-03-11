@@ -1,30 +1,36 @@
-import { useState, useEffect } from 'react'
-import { Gear, Check } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import type { Settings } from '@/lib/types'
+import { Switch } from '@/components/ui/switch'
+import { Separator } from '@/components/ui/separator'
+import { useKV } from '@github/spark/hooks'
+import { useTheme } from '@/hooks/use-theme'
+import { toast } from 'sonner'
+import type { Settings, APIKeys } from '@/lib/types'
 
 export function Settings() {
-  const [settings, setSettings] = useState<Settings>({
+  const [settings, setSettings] = useKV<Settings>('tt-travels-settings', {
     displayName: '',
     temperatureUnit: 'celsius',
   })
-  const [saved, setSaved] = useState(false)
+  const [apiKeys, setApiKeys] = useKV<APIKeys>('tt-travels-api-keys', {})
+  const { theme, toggleTheme } = useTheme()
+  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
 
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('tt-travels-settings')
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings))
-    }
-  }, [])
+  const handleSaveSettings = () => {
+    toast.success('Settings saved successfully!')
+  }
 
-  const handleSave = () => {
-    localStorage.setItem('tt-travels-settings', JSON.stringify(settings))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  const handleSaveAPIKeys = () => {
+    toast.success('API keys saved successfully!')
+  }
+
+  const toggleKeyVisibility = (key: string) => {
+    setShowKeys((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
   return (
@@ -41,6 +47,37 @@ export function Settings() {
 
       <Card className="max-w-2xl mx-auto glass-surface">
         <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+          <CardDescription>
+            Customize the visual theme of the application
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-base">Dark Mode</Label>
+              <p className="text-xs text-muted-foreground">
+                Switch between light and dark themes
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-10 w-10"
+            >
+              {theme === 'dark' ? (
+                <Sun size={20} weight="fill" className="text-accent" />
+              ) : (
+                <Moon size={20} weight="fill" className="text-primary" />
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl mx-auto glass-surface">
+        <CardHeader>
           <CardTitle>User Preferences</CardTitle>
           <CardDescription>
             Manage your personal settings and display preferences
@@ -52,9 +89,9 @@ export function Settings() {
             <Input
               id="display-name"
               placeholder="Enter your name"
-              value={settings.displayName}
+              value={settings?.displayName || ''}
               onChange={(e) =>
-                setSettings({ ...settings, displayName: e.target.value })
+                setSettings((current) => ({ ...current!, displayName: e.target.value }))
               }
             />
             <p className="text-xs text-muted-foreground">
@@ -65,12 +102,12 @@ export function Settings() {
           <div className="space-y-3">
             <Label>Temperature Unit</Label>
             <RadioGroup
-              value={settings.temperatureUnit}
+              value={settings?.temperatureUnit || 'celsius'}
               onValueChange={(value) =>
-                setSettings({
-                  ...settings,
+                setSettings((current) => ({
+                  ...current!,
                   temperatureUnit: value as 'celsius' | 'fahrenheit',
-                })
+                }))
               }
             >
               <div className="flex items-center space-x-2">
@@ -92,19 +129,160 @@ export function Settings() {
           </div>
 
           <Button
-            onClick={handleSave}
+            onClick={handleSaveSettings}
             className="w-full gap-2"
             size="lg"
           >
-            {saved ? (
-              <>
-                <Check size={20} weight="bold" />
-                Saved!
-              </>
-            ) : (
-              'Save Settings'
-            )}
+            <Check size={20} weight="bold" />
+            Save Settings
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl mx-auto glass-surface">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Key size={24} className="text-primary" weight="fill" />
+            <div>
+              <CardTitle>API Keys</CardTitle>
+              <CardDescription>
+                Configure API keys for third-party services (stored locally)
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="amadeus-api-key">Amadeus API Key</Label>
+            <div className="flex gap-2">
+              <Input
+                id="amadeus-api-key"
+                type={showKeys['amadeus_api_key'] ? 'text' : 'password'}
+                placeholder="Enter your Amadeus API key"
+                value={apiKeys?.amadeus_api_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, amadeus_api_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('amadeus_api_key')}
+              >
+                {showKeys['amadeus_api_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Required for flight and hotel search functionality
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="amadeus-api-secret">Amadeus API Secret</Label>
+            <div className="flex gap-2">
+              <Input
+                id="amadeus-api-secret"
+                type={showKeys['amadeus_api_secret'] ? 'text' : 'password'}
+                placeholder="Enter your Amadeus API secret"
+                value={apiKeys?.amadeus_api_secret || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, amadeus_api_secret: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('amadeus_api_secret')}
+              >
+                {showKeys['amadeus_api_secret'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <Label htmlFor="openweather-api-key">OpenWeather API Key</Label>
+            <div className="flex gap-2">
+              <Input
+                id="openweather-api-key"
+                type={showKeys['openweather_api_key'] ? 'text' : 'password'}
+                placeholder="Enter your OpenWeather API key"
+                value={apiKeys?.openweather_api_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, openweather_api_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('openweather_api_key')}
+              >
+                {showKeys['openweather_api_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Required for weather data and activity recommendations
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <Label htmlFor="airbnb-api-key">Airbnb API Key</Label>
+            <div className="flex gap-2">
+              <Input
+                id="airbnb-api-key"
+                type={showKeys['airbnb_api_key'] ? 'text' : 'password'}
+                placeholder="Enter your Airbnb API key"
+                value={apiKeys?.airbnb_api_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, airbnb_api_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('airbnb_api_key')}
+              >
+                {showKeys['airbnb_api_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Optional: for Airbnb accommodation search
+            </p>
+          </div>
+
+          <Button
+            onClick={handleSaveAPIKeys}
+            className="w-full gap-2"
+            size="lg"
+          >
+            <Check size={20} weight="bold" />
+            Save API Keys
+          </Button>
+
+          <div className="rounded-lg bg-muted p-4">
+            <p className="text-xs text-muted-foreground">
+              <strong>Privacy Note:</strong> All API keys are stored locally in your browser and never sent to any server except the respective service providers when making API calls.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

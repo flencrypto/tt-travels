@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, MapPin, Camera, Sparkle, CalendarDots, Gear, Ticket } from '@phosphor-icons/react'
+import { House, MapPin, Camera, Sparkle, CalendarDots, Gear, Ticket, Moon, Sun } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '@/hooks/use-theme'
 
 const routes = [
   { path: '/', label: 'Dashboard', icon: House },
@@ -14,6 +16,7 @@ const routes = [
 
 export function Navigation() {
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <header className="glass-surface sticky top-0 z-50 border-b">
@@ -44,9 +47,33 @@ export function Navigation() {
                 </Link>
               )
             })}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="ml-2 rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun size={20} weight="fill" />
+              ) : (
+                <Moon size={20} weight="fill" />
+              )}
+            </Button>
           </div>
 
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full"
+            >
+              {theme === 'dark' ? (
+                <Sun size={20} weight="fill" />
+              ) : (
+                <Moon size={20} weight="fill" />
+              )}
+            </Button>
             <Link
               to="/settings"
               className="p-2 rounded-lg hover:bg-muted transition-colors"

@@ -25,6 +25,13 @@ export interface Settings {
   temperatureUnit: 'celsius' | 'fahrenheit'
 }
 
+export interface APIKeys {
+  amadeus_api_key?: string
+  amadeus_api_secret?: string
+  openweather_api_key?: string
+  airbnb_api_key?: string
+}
+
 export interface Integration {
   id: string
   name: string
