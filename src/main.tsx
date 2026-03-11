@@ -10,21 +10,17 @@ import "./main.css"
 import "./styles/theme.css"
 import "./index.css"
 
-const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_placeholder'
 
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    {publishableKey ? (
-      <ClerkProvider 
-        publishableKey={publishableKey} 
-        afterSignOutUrl="/"
-        signInFallbackRedirectUrl="/dashboard"
-        signUpFallbackRedirectUrl="/setup"
-      >
-        <App />
-      </ClerkProvider>
-    ) : (
+    <ClerkProvider 
+      publishableKey={publishableKey} 
+      afterSignOutUrl="/"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/setup"
+    >
       <App />
-    )}
+    </ClerkProvider>
    </ErrorBoundary>
 )

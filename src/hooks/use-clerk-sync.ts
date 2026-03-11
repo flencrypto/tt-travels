@@ -24,6 +24,9 @@ export function useClerkSync() {
   const hasInitialized = useRef(false)
   const isSyncing = useRef(false)
   
+  const hasValidClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && 
+    import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== 'pk_test_placeholder'
+  
   const [localTrips] = useKV<Trip[]>('trips', [])
   const [localSettings] = useKV<Settings>('tt-travels-settings', {
     displayName: '',
@@ -35,7 +38,7 @@ export function useClerkSync() {
   const [localItineraryHistory] = useKV<ItinerarySearchHistory[]>('itinerary-search-history', [])
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user || hasInitialized.current || isSyncing.current) {
+    if (!hasValidClerkKey || !isLoaded || !isSignedIn || !user || hasInitialized.current || isSyncing.current) {
       return
     }
 
@@ -81,7 +84,7 @@ export function useClerkSync() {
   }, [isLoaded, isSignedIn, user])
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user || !hasInitialized.current || isSyncing.current) {
+    if (!hasValidClerkKey || !isLoaded || !isSignedIn || !user || !hasInitialized.current || isSyncing.current) {
       return
     }
 
