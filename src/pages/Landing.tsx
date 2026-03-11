@@ -251,12 +251,12 @@ export function Landing() {
                 <ArrowRight size={20} weight="bold" />
               </Button>
             </SignUpButton>
-            <Link to="/explore">
-              <Button size="lg" variant="outline" className="gap-2 text-lg">
+            <Button size="lg" variant="outline" className="gap-2 text-lg" asChild>
+              <Link to="/explore">
                 <MapPin size={20} weight="bold" />
                 Explore Destinations
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -276,19 +276,19 @@ export function Landing() {
             <div>
               <h4 className="mb-4 font-semibold">Features</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/ai-planner" className="hover:text-foreground">AI Planner</Link></li>
-                <li><Link to="/explore" className="hover:text-foreground">Explore</Link></li>
-                <li><Link to="/bookings" className="hover:text-foreground">Bookings</Link></li>
-                <li><Link to="/trips" className="hover:text-foreground">Trips</Link></li>
+                <li><Link to="/ai-planner" className="hover:text-foreground transition-colors">AI Planner</Link></li>
+                <li><Link to="/explore" className="hover:text-foreground transition-colors">Explore</Link></li>
+                <li><Link to="/bookings" className="hover:text-foreground transition-colors">Bookings</Link></li>
+                <li><Link to="/trips" className="hover:text-foreground transition-colors">Trips</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="mb-4 font-semibold">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/setup" className="hover:text-foreground">Setup Guide</Link></li>
-                <li><Link to="/settings" className="hover:text-foreground">Settings</Link></li>
-                <li><Link to="/journal" className="hover:text-foreground">Journal</Link></li>
+                <li><Link to="/setup" className="hover:text-foreground transition-colors">Setup Guide</Link></li>
+                <li><Link to="/settings" className="hover:text-foreground transition-colors">Settings</Link></li>
+                <li><Link to="/journal" className="hover:text-foreground transition-colors">Journal</Link></li>
               </ul>
             </div>
             
