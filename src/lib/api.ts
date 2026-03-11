@@ -353,6 +353,81 @@ export interface PackingListItem {
   name: string
   category: string
   checked: boolean
+  weatherBased?: boolean
+  reason?: string
+}
+
+export interface DestinationWeather {
+  temperature: number
+  condition: string
+  unit: string
+}
+
+async function fetchDestinationWeather(destination: string): Promise<DestinationWeather | null> {
+  try {
+    const geocodeResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(destination)}&format=json&limit=1`
+    )
+    
+    if (!geocodeResponse.ok) {
+      return null
+    }
+
+    const geocodeData = await geocodeResponse.json()
+    
+    if (!geocodeData || geocodeData.length === 0) {
+      return null
+    }
+
+    const { lat, lon } = geocodeData[0]
+
+    const weatherResponse = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius`
+    )
+
+    if (!weatherResponse.ok) {
+      return null
+    }
+
+    const weatherData = await weatherResponse.json()
+    const temp = weatherData.current_weather?.temperature || 0
+    const weatherCode = weatherData.current_weather?.weathercode || 0
+
+    const weatherConditions: Record<number, string> = {
+      0: 'clear',
+      1: 'mainly clear',
+      2: 'partly cloudy',
+      3: 'overcast',
+      45: 'foggy',
+      48: 'foggy',
+      51: 'light drizzle',
+      53: 'moderate drizzle',
+      55: 'dense drizzle',
+      61: 'slight rain',
+      63: 'moderate rain',
+      65: 'heavy rain',
+      71: 'slight snow',
+      73: 'moderate snow',
+      75: 'heavy snow',
+      77: 'snow grains',
+      80: 'slight rain showers',
+      81: 'moderate rain showers',
+      82: 'violent rain showers',
+      85: 'slight snow showers',
+      86: 'heavy snow showers',
+      95: 'thunderstorm',
+      96: 'thunderstorm with hail',
+      99: 'thunderstorm with hail',
+    }
+
+    return {
+      temperature: temp,
+      condition: weatherConditions[weatherCode] || 'varied',
+      unit: '°C',
+    }
+  } catch (error) {
+    return null
+  }
 }
 
 export async function generatePackingList(options: PackingListOptions): Promise<PackingListItem[]> {
@@ -363,6 +438,8 @@ export async function generatePackingList(options: PackingListOptions): Promise<
   }
 
   const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
+
+  const weather = await fetchDestinationWeather(options.destination)
 
   const travelStyleDescriptions: Record<string, string> = {
     adventure: 'outdoor activities, hiking, extreme sports',
@@ -376,7 +453,15 @@ export async function generatePackingList(options: PackingListOptions): Promise<
     balanced: 'a balanced mix of activities',
   }
 
-  const systemPrompt = 'You are a travel packing expert. Generate comprehensive, practical packing lists tailored to the destination, trip duration, travel style, and group type. Organize items by category. Return ONLY a valid JSON object with a "items" property containing an array of objects with "name" and "category" properties.'
+  const systemPrompt = 'You are a travel packing expert. Generate comprehensive, practical packing lists tailored to the destination, trip duration, travel style, group type, and current weather conditions. Organize items by category. Mark weather-specific items with a weatherBased flag and provide a brief reason. Return ONLY a valid JSON object with an "items" property containing an array of objects.'
+
+  const weatherContext = weather 
+    ? `\n\nCurrent Weather in ${options.destination}:
+- Temperature: ${weather.temperature}${weather.unit}
+- Conditions: ${weather.condition}
+
+IMPORTANT: Based on these weather conditions, recommend appropriate weather-specific items and mark them with "weatherBased": true and include a "reason" field explaining why (e.g., "Heavy rain expected", "Cold temperatures", "Hot weather"). This is critical for helping travelers prepare for the actual conditions.`
+    : ''
 
   const userPrompt = `Create a detailed packing list for a ${options.duration}-day trip to ${options.destination}.
 
@@ -384,11 +469,12 @@ Travel Details:
 - Travel Style: ${travelStyleDescriptions[options.travelStyle] || 'balanced'}
 - Budget Level: ${options.budget}
 - Group Type: ${options.groupType}
-${options.season ? `- Season: ${options.season}` : ''}
+${options.season ? `- Season: ${options.season}` : ''}${weatherContext}
 
 Categories to include:
 - Essentials (passport, documents, wallet, etc.)
 - Clothing (appropriate for destination climate and activities)
+- Weather Protection (based on current weather conditions)
 - Toiletries
 - Electronics
 - Health & Safety
@@ -398,13 +484,14 @@ Categories to include:
 Return ONLY a JSON object in this exact format:
 {
   "items": [
-    {"name": "Passport", "category": "Essentials"},
-    {"name": "T-shirts", "category": "Clothing"},
+    {"name": "Passport", "category": "Essentials", "weatherBased": false},
+    {"name": "Umbrella", "category": "Weather Protection", "weatherBased": true, "reason": "Moderate rain expected"},
+    {"name": "Sunscreen SPF 50", "category": "Toiletries", "weatherBased": true, "reason": "Hot sunny weather"},
     ...more items
   ]
 }
 
-Be specific and practical. Consider the destination's climate, culture, and the travel style.`
+Be specific and practical. Consider the destination's climate, culture, travel style, and especially the current weather conditions. Include 5-10 weather-specific recommendations marked with weatherBased: true.`
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -443,11 +530,13 @@ Be specific and practical. Consider the destination's climate, culture, and the 
     const parsed = JSON.parse(content)
     const items = parsed.items || []
 
-    return items.map((item: { name: string; category: string }, index: number) => ({
+    return items.map((item: { name: string; category: string; weatherBased?: boolean; reason?: string }, index: number) => ({
       id: `item-${index}`,
       name: item.name,
       category: item.category,
       checked: false,
+      weatherBased: item.weatherBased || false,
+      reason: item.reason,
     }))
   } catch (error) {
     if (error instanceof MissingApiKeyError) {

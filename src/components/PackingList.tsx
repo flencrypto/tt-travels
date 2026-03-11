@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Backpack, Sparkle, Check, Plus, Trash } from '@phosphor-icons/react'
+import { Backpack, Sparkle, Check, Plus, Trash, CloudRain, Sun, Snowflake, Info } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 
 export interface PackingItem {
@@ -15,6 +16,8 @@ export interface PackingItem {
   category: string
   checked: boolean
   isCustom?: boolean
+  weatherBased?: boolean
+  reason?: string
 }
 
 interface PackingListProps {
@@ -80,6 +83,23 @@ export function PackingList({
   const checkedCount = items.filter((item) => item.checked).length
   const totalCount = items.length
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0
+  const weatherBasedCount = items.filter((item) => item.weatherBased).length
+
+  const getWeatherIcon = (reason?: string) => {
+    if (!reason) return <CloudRain size={14} weight="fill" />
+    
+    const lowerReason = reason.toLowerCase()
+    if (lowerReason.includes('rain') || lowerReason.includes('wet')) {
+      return <CloudRain size={14} weight="fill" />
+    }
+    if (lowerReason.includes('cold') || lowerReason.includes('snow') || lowerReason.includes('winter')) {
+      return <Snowflake size={14} weight="fill" />
+    }
+    if (lowerReason.includes('hot') || lowerReason.includes('sun') || lowerReason.includes('heat')) {
+      return <Sun size={14} weight="fill" />
+    }
+    return <CloudRain size={14} weight="fill" />
+  }
 
   return (
     <Card className="glass-surface">
@@ -92,6 +112,11 @@ export function PackingList({
             </div>
             <CardDescription>
               Customized for {duration}-day {travelStyle} trip to {destination}
+              {weatherBasedCount > 0 && (
+                <span className="block mt-1 text-accent font-medium">
+                  {weatherBasedCount} weather-based recommendations included
+                </span>
+              )}
             </CardDescription>
           </div>
           <Button onClick={handleSaveList} variant="outline" size="sm">
@@ -148,7 +173,27 @@ export function PackingList({
                           item.checked ? 'line-through text-muted-foreground' : ''
                         }`}
                       >
-                        {item.name}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span>{item.name}</span>
+                          {item.weatherBased && item.reason && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="text-xs gap-1 bg-accent/15 text-accent-foreground hover:bg-accent/25 cursor-help"
+                                  >
+                                    {getWeatherIcon(item.reason)}
+                                    Weather
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs max-w-xs">{item.reason}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
                       </label>
                       {item.isCustom && (
                         <Button
