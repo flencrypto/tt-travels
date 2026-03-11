@@ -1,3 +1,4 @@
+/// <reference path="../vite-env.d.ts" />
 export interface GeoRecommendation {
   name: string
   category: string

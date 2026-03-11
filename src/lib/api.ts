@@ -1,3 +1,4 @@
+/// <reference path="../vite-env.d.ts" />
 import type { WeatherData, Integration, FlightSearchParams, FlightOffer, HotelSearchParams, HotelOffer } from './types'
 
 export class MissingApiKeyError extends Error {
