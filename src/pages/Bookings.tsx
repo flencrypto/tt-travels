@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AirplaneTilt, Buildings } from '@phosphor-icons/react'
+import { AirplaneTilt, Buildings, ChartLine } from '@phosphor-icons/react'
 import { FlightSearch } from '@/components/FlightSearch'
 import { HotelSearch } from '@/components/HotelSearch'
+import { PriceComparisonChart } from '@/components/PriceComparisonChart'
 
 export function Bookings() {
   const [activeTab, setActiveTab] = useState('flights')
@@ -22,7 +23,7 @@ export function Bookings() {
 
       <div className="max-w-6xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 max-w-2xl">
             <TabsTrigger value="flights" className="gap-2">
               <AirplaneTilt size={20} weight="fill" />
               Flights
@@ -30,6 +31,10 @@ export function Bookings() {
             <TabsTrigger value="hotels" className="gap-2">
               <Buildings size={20} weight="fill" />
               Hotels
+            </TabsTrigger>
+            <TabsTrigger value="price-trends" className="gap-2">
+              <ChartLine size={20} weight="fill" />
+              Price Trends
             </TabsTrigger>
           </TabsList>
 
@@ -59,6 +64,11 @@ export function Bookings() {
                 <HotelSearch />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="price-trends" className="mt-6 space-y-6">
+            <PriceComparisonChart type="flight" />
+            <PriceComparisonChart type="hotel" />
           </TabsContent>
         </Tabs>
       </div>

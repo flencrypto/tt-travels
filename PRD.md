@@ -21,11 +21,18 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Success criteria**: Users can quickly understand platform value and access any feature within 2 clicks
 
 ### Flight and Hotel Booking
-- **Functionality**: Real-time search for flights and hotels using Amadeus Travel API
-- **Purpose**: Enable users to search and compare flight and hotel options directly within the platform
+- **Functionality**: Real-time search for flights and hotels using Amadeus Travel API, with ability to save favorites to trips and compare prices across multiple dates
+- **Purpose**: Enable users to search and compare flight and hotel options directly within the platform, identify best pricing opportunities, and save preferred options to their trips
 - **Trigger**: Navigate to Bookings page, select Flights or Hotels tab, fill search form, click search
-- **Progression**: Enter search criteria (origin/destination, dates, passengers) → validate required fields → authenticate with Amadeus API → fetch real-time offers → display results with pricing and details → filter/sort results
-- **Success criteria**: Returns up to 10 flight/hotel offers within 5 seconds, displays pricing, duration, stops, hotel ratings, proper error handling for missing API credentials or search errors
+- **Progression**: Enter search criteria (origin/destination, dates, passengers) → validate required fields → authenticate with Amadeus API → fetch real-time offers → display results with pricing and details → optionally save to trip or view price trends
+- **Success criteria**: Returns up to 10 flight/hotel offers within 5 seconds, displays pricing, duration, stops, hotel ratings, allows saving to trips, proper error handling for missing API credentials or search errors
+
+### Price Comparison Across Dates
+- **Functionality**: Visual price trend analysis across 7 consecutive days for flights and hotels
+- **Purpose**: Help users identify the best dates to book by comparing prices visually with charts and statistics
+- **Trigger**: Navigate to Bookings page, select Price Trends tab, enter search criteria, click compare
+- **Progression**: Enter search criteria (route/city, start date, passengers) → fetch prices for 7 consecutive days → display interactive bar chart → show min/avg/max statistics → highlight best deal → show day-by-day price changes with percentages
+- **Success criteria**: Successfully fetches and displays prices for multiple dates, clearly identifies lowest price, shows visual comparison with color-coded bars, displays price change trends
 
 ### AI Trip Planner
 - **Functionality**: Generate personalized itineraries using OpenAI based on destination input
@@ -74,11 +81,12 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Missing API Keys**: Setup modal with clear instructions when OpenAI or Amadeus keys are not configured
 - **Geolocation Denied**: Fallback message explaining why location is needed for weather/map features
 - **Offline/Network Errors**: Graceful error messages for API failures with retry options
-- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, no itinerary generated, or no booking results found
+- **Empty States**: Helpful guidance when no trips saved, no photos uploaded, no itinerary generated, no booking results found, or no price data available
 - **Invalid Form Input**: Field validation with clear error messages for trip planning, settings, and booking search forms
 - **Browser Compatibility**: Graceful degradation for older browsers that don't support modern geolocation APIs
 - **Invalid Airport/City Codes**: Clear error messages when IATA codes are not recognized by Amadeus API
 - **Date Validation**: Prevent past dates and ensure check-out/return dates are after check-in/departure dates
+- **Price Comparison Failures**: Handle partial data when some dates don't return results, show only available data with clear indication of gaps
 
 ## Design Direction
 
@@ -162,6 +170,8 @@ Animations should enhance the sense of exploration and smooth transitions betwee
 - House for dashboard/home
 - Warning for error states
 - Check for success confirmation
+- ChartLine for price trends and analytics
+- HeartStraight for saving favorites
 
 **Spacing**: 
 - Page padding: px-6 md:px-12
