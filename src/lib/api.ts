@@ -578,8 +578,30 @@ Be specific to ${destination} - mention actual landmarks, neighborhoods, and loc
 
   try {
     const result = await spark.llm(prompt, 'gpt-4o', true)
-    const parsed = JSON.parse(result)
-    const activities = parsed.activities || []
+    
+    if (!result || result.trim().length === 0) {
+      throw new Error('Empty response from AI service')
+    }
+
+    let parsed
+    try {
+      parsed = JSON.parse(result)
+    } catch (parseError) {
+      throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : 'Could not parse response'}`)
+    }
+
+    if (!parsed.activities || !Array.isArray(parsed.activities)) {
+      throw new Error('Response missing activities array')
+    }
+
+    const activities = parsed.activities.map((activity: any) => ({
+      name: activity.name || 'Unknown Activity',
+      description: activity.description || '',
+      category: activity.category || 'General',
+      suitability: activity.suitability || 'good',
+      weatherReason: activity.weatherReason || '',
+      tips: Array.isArray(activity.tips) ? activity.tips : [],
+    }))
 
     return activities as WeatherActivity[]
   } catch (error) {
