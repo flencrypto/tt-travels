@@ -3,6 +3,7 @@ import { House, MapPin, Camera, Sparkle, CalendarDots, Gear, Ticket, Moon, Sun, 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/hooks/use-theme'
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 
 const routes = [
   { path: '/', label: 'Dashboard', icon: House },
@@ -60,6 +61,22 @@ export function Navigation() {
                 <Moon size={20} weight="fill" />
               )}
             </Button>
+            
+            <Show when="signed-out">
+              <div className="flex items-center gap-2 ml-2">
+                <SignInButton mode="modal">
+                  <Button variant="ghost" size="sm">Sign In</Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button size="sm">Sign Up</Button>
+                </SignUpButton>
+              </div>
+            </Show>
+            <Show when="signed-in">
+              <div className="ml-2">
+                <UserButton />
+              </div>
+            </Show>
           </div>
 
           <div className="md:hidden flex items-center gap-2">
@@ -75,6 +92,14 @@ export function Navigation() {
                 <Moon size={20} weight="fill" />
               )}
             </Button>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm">Sign In</Button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
             <Link
               to="/settings"
               className="p-2 rounded-lg hover:bg-muted transition-colors"

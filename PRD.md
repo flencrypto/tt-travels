@@ -71,6 +71,13 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Progression**: View current settings → modify name or unit → click save → persist to localStorage → show confirmation message
 - **Success criteria**: Settings persist across sessions, weather display respects unit preference immediately
 
+### User Authentication (Clerk)
+- **Functionality**: Complete authentication system with sign-in, sign-up, and user profile management powered by Clerk
+- **Purpose**: Secure user accounts, enable personalized experiences, and provide professional authentication UI
+- **Trigger**: Click Sign In/Sign Up buttons in navigation header, or interact with UserButton when authenticated
+- **Progression**: (Sign Up) Click Sign Up → enter email/choose social provider → complete authentication flow → redirect to dashboard with signed-in state OR (Sign In) Click Sign In → enter credentials → authenticate → return to current page OR (Profile) Click UserButton → view profile/settings → manage account → sign out
+- **Success criteria**: Modal-based authentication flows work smoothly, user state persists across sessions, UserButton displays current user avatar and name, sign out redirects to home page, authentication UI matches app theme, all Clerk components render correctly on desktop and mobile
+
 ### Setup/Integration Registry
 - **Functionality**: View integration status, setup instructions, and configuration requirements
 - **Purpose**: Guide users through necessary API key setup and browser permission configuration
@@ -80,6 +87,8 @@ This is a sophisticated multi-feature application with route-based navigation, e
 
 ## Edge Case Handling
 
+- **Authentication Errors**: Handle Clerk authentication failures gracefully with clear error messages, provide retry mechanisms for network issues
+- **Unauthenticated State**: Show appropriate sign-in prompts for features that benefit from authentication while keeping core features accessible
 - **Missing API Keys**: Setup modal with clear instructions when OpenAI or Amadeus keys are not configured
 - **Geolocation Denied**: Fallback message explaining why location is needed for weather/map features, weather search still available without geolocation
 - **Offline/Network Errors**: Graceful error messages for API failures with retry options, separate error handling for geocoding vs weather fetch
