@@ -578,21 +578,30 @@ Return ONLY a JSON object in this exact format:
 Be specific to ${destination} - mention actual landmarks, neighborhoods, and local favorites. Consider the weather when rating suitability.`
 
   try {
+    const apiKeys = await getStoredAPIKeys()
+    const envKey = import.meta.env.VITE_OPENAI_API_KEY
+    
+    if (!apiKeys?.openai_api_key && !envKey) {
+      throw new Error('OpenAI API key not configured. Please add it in Settings.')
+    }
+
     const result = await spark.llm(prompt, 'gpt-4o', true)
     
     if (!result || result.trim().length === 0) {
-      throw new Error('Empty response from AI service')
+      throw new Error('Empty response from AI service. Please check your OpenAI API key.')
     }
 
     let parsed
     try {
       parsed = JSON.parse(result)
     } catch (parseError) {
-      throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : 'Could not parse response'}`)
+      console.error('Failed to parse AI response:', result)
+      throw new Error(`Invalid JSON response from AI. Please try again.`)
     }
 
     if (!parsed.activities || !Array.isArray(parsed.activities)) {
-      throw new Error('Response missing activities array')
+      console.error('Response missing activities array:', parsed)
+      throw new Error('AI response format incorrect. Please try again.')
     }
 
     const activities = parsed.activities.map((activity: any) => ({
@@ -606,6 +615,7 @@ Be specific to ${destination} - mention actual landmarks, neighborhoods, and loc
 
     return activities as WeatherActivity[]
   } catch (error) {
+    console.error('Activity generation error:', error)
     throw new Error(`Failed to generate activity recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
@@ -671,12 +681,35 @@ Return ONLY a JSON object in this exact format:
 Ensure destinations are diverse geographically, culturally distinct, and genuinely match the specified interests and constraints.`
 
   try {
-    const result = await spark.llm(prompt, 'gpt-4o', true)
-    const parsed = JSON.parse(result)
-    const recommendations = parsed.recommendations || []
+    const apiKeys = await getStoredAPIKeys()
+    const envKey = import.meta.env.VITE_OPENAI_API_KEY
+    
+    if (!apiKeys?.openai_api_key && !envKey) {
+      throw new Error('OpenAI API key not configured. Please add it in Settings.')
+    }
 
-    return recommendations as DestinationRecommendation[]
+    const result = await spark.llm(prompt, 'gpt-4o', true)
+    
+    if (!result || result.trim().length === 0) {
+      throw new Error('Empty response from AI service. Please check your OpenAI API key.')
+    }
+
+    let parsed
+    try {
+      parsed = JSON.parse(result)
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', result)
+      throw new Error(`Invalid JSON response from AI. Please try again.`)
+    }
+
+    if (!parsed.recommendations || !Array.isArray(parsed.recommendations)) {
+      console.error('Response missing recommendations array:', parsed)
+      throw new Error('AI response format incorrect. Please try again.')
+    }
+
+    return parsed.recommendations as DestinationRecommendation[]
   } catch (error) {
+    console.error('Destination recommendations error:', error)
     throw new Error(`Failed to generate destination recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
