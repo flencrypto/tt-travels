@@ -1,4 +1,4 @@
-import type { WeatherData, Integration } from './types'
+import type { WeatherData, Integration, FlightSearchParams, FlightOffer, HotelSearchParams, HotelOffer } from './types'
 
 export class MissingApiKeyError extends Error {
   constructor(message: string) {
