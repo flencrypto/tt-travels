@@ -32,6 +32,12 @@ export interface APIKeys {
   airbnb_api_key?: string
 }
 
+export interface APIValidationResult {
+  isValid: boolean
+  message: string
+  details?: string
+}
+
 export interface Integration {
   id: string
   name: string

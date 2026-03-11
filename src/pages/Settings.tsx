@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash } from '@phosphor-icons/react'
+import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,10 +7,17 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { useKV } from '@github/spark/hooks'
 import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
-import type { Settings, APIKeys } from '@/lib/types'
+import type { Settings, APIKeys, APIValidationResult } from '@/lib/types'
+import { 
+  validateAmadeusCredentials, 
+  validateOpenWeatherKey, 
+  validateAirbnbKey,
+  testAllConnections 
+} from '@/lib/api-validation'
 
 export function Settings() {
   const [settings, setSettings] = useKV<Settings>('tt-travels-settings', {
@@ -20,6 +27,13 @@ export function Settings() {
   const [apiKeys, setApiKeys] = useKV<APIKeys>('tt-travels-api-keys', {})
   const { theme, toggleTheme } = useTheme()
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
+  const [validationResults, setValidationResults] = useState<{
+    amadeus?: APIValidationResult
+    openweather?: APIValidationResult
+    airbnb?: APIValidationResult
+  }>({})
+  const [isTestingAll, setIsTestingAll] = useState(false)
+  const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
 
   const handleSaveSettings = () => {
     toast.success('Settings saved successfully!')
@@ -31,6 +45,107 @@ export function Settings() {
 
   const toggleKeyVisibility = (key: string) => {
     setShowKeys((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const testAmadeusConnection = async () => {
+    if (!apiKeys?.amadeus_api_key || !apiKeys?.amadeus_api_secret) {
+      toast.error('Please enter both Amadeus API key and secret')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, amadeus: true }))
+    const result = await validateAmadeusCredentials(
+      apiKeys.amadeus_api_key,
+      apiKeys.amadeus_api_secret
+    )
+    setValidationResults((prev) => ({ ...prev, amadeus: result }))
+    setIsTesting((prev) => ({ ...prev, amadeus: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testOpenWeatherConnection = async () => {
+    if (!apiKeys?.openweather_api_key) {
+      toast.error('Please enter OpenWeather API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, openweather: true }))
+    const result = await validateOpenWeatherKey(apiKeys.openweather_api_key)
+    setValidationResults((prev) => ({ ...prev, openweather: result }))
+    setIsTesting((prev) => ({ ...prev, openweather: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testAirbnbConnection = async () => {
+    if (!apiKeys?.airbnb_api_key) {
+      toast.error('Please enter Airbnb API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, airbnb: true }))
+    const result = await validateAirbnbKey(apiKeys.airbnb_api_key)
+    setValidationResults((prev) => ({ ...prev, airbnb: result }))
+    setIsTesting((prev) => ({ ...prev, airbnb: false }))
+
+    toast.info(result.message)
+  }
+
+  const testAllAPIConnections = async () => {
+    if (!apiKeys || Object.keys(apiKeys).length === 0) {
+      toast.error('Please enter at least one API key')
+      return
+    }
+
+    setIsTestingAll(true)
+    toast.info('Testing all API connections...')
+
+    const results = await testAllConnections(apiKeys)
+    
+    const filteredResults = {
+      ...(results.amadeus && { amadeus: results.amadeus }),
+      ...(results.openweather && { openweather: results.openweather }),
+      ...(results.airbnb && { airbnb: results.airbnb }),
+    }
+    
+    setValidationResults(filteredResults)
+    setIsTestingAll(false)
+
+    const validCount = Object.values(results).filter((r) => r?.isValid).length
+    const totalCount = Object.values(results).filter((r) => r !== null).length
+
+    if (validCount === totalCount) {
+      toast.success(`All ${totalCount} API connections verified successfully!`)
+    } else if (validCount > 0) {
+      toast.warning(`${validCount} of ${totalCount} API connections verified`)
+    } else {
+      toast.error('All API connection tests failed')
+    }
+  }
+
+  const getValidationIcon = (result?: APIValidationResult) => {
+    if (!result) return null
+    if (result.isValid) {
+      return <CheckCircle size={20} weight="fill" className="text-green-600" />
+    }
+    return <XCircle size={20} weight="fill" className="text-red-600" />
+  }
+
+  const getValidationBadge = (result?: APIValidationResult) => {
+    if (!result) return null
+    if (result.isValid) {
+      return <Badge className="bg-green-100 text-green-800 border-green-300">Verified</Badge>
+    }
+    return <Badge variant="destructive">Failed</Badge>
   }
 
   return (
@@ -141,19 +256,33 @@ export function Settings() {
 
       <Card className="max-w-2xl mx-auto glass-surface">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Key size={24} className="text-primary" weight="fill" />
-            <div>
-              <CardTitle>API Keys</CardTitle>
-              <CardDescription>
-                Configure API keys for third-party services (stored locally)
-              </CardDescription>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Key size={24} className="text-primary" weight="fill" />
+              <div>
+                <CardTitle>API Keys</CardTitle>
+                <CardDescription>
+                  Configure API keys for third-party services (stored locally)
+                </CardDescription>
+              </div>
             </div>
+            <Button
+              onClick={testAllAPIConnections}
+              disabled={isTestingAll || !apiKeys || Object.keys(apiKeys).length === 0}
+              variant="outline"
+              className="gap-2"
+            >
+              <Lightning size={20} weight="fill" />
+              Test All
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="amadeus-api-key">Amadeus API Key</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="amadeus-api-key">Amadeus API Key</Label>
+              {getValidationBadge(validationResults.amadeus)}
+            </div>
             <div className="flex gap-2">
               <Input
                 id="amadeus-api-key"
@@ -176,13 +305,30 @@ export function Settings() {
                 )}
               </Button>
             </div>
+            {validationResults.amadeus && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.amadeus.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.amadeus)}
+                <div>
+                  <p className="font-medium">{validationResults.amadeus.message}</p>
+                  {validationResults.amadeus.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.amadeus.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               Required for flight and hotel search functionality
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amadeus-api-secret">Amadeus API Secret</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="amadeus-api-secret">Amadeus API Secret</Label>
+            </div>
             <div className="flex gap-2">
               <Input
                 id="amadeus-api-secret"
@@ -204,13 +350,31 @@ export function Settings() {
                   <Eye size={20} />
                 )}
               </Button>
+              <Button
+                variant="secondary"
+                onClick={testAmadeusConnection}
+                disabled={isTesting.amadeus || !apiKeys?.amadeus_api_key || !apiKeys?.amadeus_api_secret}
+                className="gap-2"
+              >
+                {isTesting.amadeus ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
           <Separator />
 
           <div className="space-y-2">
-            <Label htmlFor="openweather-api-key">OpenWeather API Key</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="openweather-api-key">OpenWeather API Key</Label>
+              {getValidationBadge(validationResults.openweather)}
+            </div>
             <div className="flex gap-2">
               <Input
                 id="openweather-api-key"
@@ -232,7 +396,37 @@ export function Settings() {
                   <Eye size={20} />
                 )}
               </Button>
+              <Button
+                variant="secondary"
+                onClick={testOpenWeatherConnection}
+                disabled={isTesting.openweather || !apiKeys?.openweather_api_key}
+                className="gap-2"
+              >
+                {isTesting.openweather ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
             </div>
+            {validationResults.openweather && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.openweather.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.openweather)}
+                <div>
+                  <p className="font-medium">{validationResults.openweather.message}</p>
+                  {validationResults.openweather.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.openweather.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               Required for weather data and activity recommendations
             </p>
@@ -241,7 +435,10 @@ export function Settings() {
           <Separator />
 
           <div className="space-y-2">
-            <Label htmlFor="airbnb-api-key">Airbnb API Key</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="airbnb-api-key">Airbnb API Key</Label>
+              {getValidationBadge(validationResults.airbnb)}
+            </div>
             <div className="flex gap-2">
               <Input
                 id="airbnb-api-key"
@@ -263,7 +460,37 @@ export function Settings() {
                   <Eye size={20} />
                 )}
               </Button>
+              <Button
+                variant="secondary"
+                onClick={testAirbnbConnection}
+                disabled={isTesting.airbnb || !apiKeys?.airbnb_api_key}
+                className="gap-2"
+              >
+                {isTesting.airbnb ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
             </div>
+            {validationResults.airbnb && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.airbnb.isValid 
+                  ? 'bg-blue-50 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                <WarningCircle size={20} weight="fill" className="text-blue-600" />
+                <div>
+                  <p className="font-medium">{validationResults.airbnb.message}</p>
+                  {validationResults.airbnb.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.airbnb.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               Optional: for Airbnb accommodation search
             </p>
