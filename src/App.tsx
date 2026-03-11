@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { Show } from '@clerk/react'
 import { Navigation } from './components/Navigation'
+import { Landing } from './pages/Landing'
 import { Dashboard } from './pages/Dashboard'
 import { Explore } from './pages/Explore'
 import { Favorites } from './pages/Favorites'
@@ -13,19 +15,27 @@ import { DestinationDetail } from './pages/DestinationDetail'
 import { Toaster } from './components/ui/sonner'
 import { useClerkSync } from './hooks/use-clerk-sync'
 
-function App() {
-  useClerkSync()
+function AppContent() {
+  const location = useLocation()
+  const isLandingPage = location.pathname === '/' || location.pathname === '/landing'
   
   return (
-    <BrowserRouter>
+    <>
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Show when="signed-in">
+          <Navigation />
+        </Show>
+        <Show when="signed-out">
+          {!isLandingPage && <Navigation />}
+        </Show>
         <main id="main-content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:destinationName" element={<DestinationDetail />} />
             <Route path="/favorites" element={<Favorites />} />
@@ -39,6 +49,16 @@ function App() {
         </main>
       </div>
       <Toaster />
+    </>
+  )
+}
+
+function App() {
+  useClerkSync()
+  
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   )
 }

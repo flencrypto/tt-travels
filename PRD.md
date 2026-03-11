@@ -13,10 +13,17 @@ This is a sophisticated multi-feature application with route-based navigation, e
 
 ## Essential Features
 
+### Landing Page
+- **Functionality**: Public-facing marketing page showcasing platform features with sign-in/sign-up CTAs, feature highlights, benefits overview, statistics showcase, and footer navigation
+- **Purpose**: Convert visitors to users by clearly communicating platform value and providing frictionless authentication entry points
+- **Trigger**: Navigate to root path (/) when not authenticated, or manually visit /landing
+- **Progression**: User visits landing page → reads hero section with value proposition → scrolls through feature cards and benefits → clicks Sign Up CTA → completes Clerk authentication modal → redirects to dashboard as authenticated user OR clicks Sign In → authenticates → accesses full platform
+- **Success criteria**: Clear value proposition immediately visible, multiple strategically placed Sign Up/Sign In CTAs, feature cards showcase all major capabilities with icons and descriptions, benefits list with checkmarks, visual mock dashboard preview, responsive design adapts perfectly to mobile, smooth transitions and hover effects on interactive elements, footer with navigation links to all major pages
+
 ### Dashboard/Home Command Center
-- **Functionality**: Central hub displaying brand hero, quick actions, KPI tiles, workflow steps, and feature cards
-- **Purpose**: Orient users and provide fast access to all major capabilities
-- **Trigger**: Default landing route (/)
+- **Functionality**: Central hub displaying brand hero, quick actions, KPI tiles, workflow steps, and feature cards (accessible after authentication)
+- **Purpose**: Orient authenticated users and provide fast access to all major capabilities
+- **Trigger**: Navigate to /dashboard route when authenticated
 - **Progression**: User lands on dashboard → views KPI metrics → selects quick action or feature card → navigates to specific module
 - **Success criteria**: Users can quickly understand platform value and access any feature within 2 clicks
 
@@ -87,6 +94,8 @@ This is a sophisticated multi-feature application with route-based navigation, e
 
 ## Edge Case Handling
 
+- **Unauthenticated Access**: Landing page displayed at root (/) for non-authenticated users, navigation bar shows Sign In/Sign Up buttons, internal pages remain accessible but show auth prompts where appropriate
+- **Post-Authentication Redirect**: After successful sign-up/sign-in, users are redirected to /dashboard to begin their journey
 - **Authentication Errors**: Handle Clerk authentication failures gracefully with clear error messages, provide retry mechanisms for network issues
 - **Unauthenticated State**: Show appropriate sign-in prompts for features that benefit from authentication while keeping core features accessible
 - **Missing API Keys**: Setup modal with clear instructions when OpenAI or Amadeus keys are not configured

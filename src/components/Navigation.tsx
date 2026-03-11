@@ -7,7 +7,7 @@ import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 import { SyncStatusIndicator } from '@/components/SyncStatusIndicator'
 
 const routes = [
-  { path: '/', label: 'Dashboard', icon: House },
+  { path: '/dashboard', label: 'Dashboard', icon: House },
   { path: '/explore', label: 'Explore', icon: MapPin },
   { path: '/favorites', label: 'Favorites', icon: Heart },
   { path: '/bookings', label: 'Bookings', icon: Ticket },
