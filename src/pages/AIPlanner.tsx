@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkle, Warning, Backpack, Compass, MapTrifold } from '@phosphor-icons/react'
+import { Sparkle, Warning, Backpack, Compass, MapTrifold, ClockCounterClockwise, Trash } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,7 @@ import { DestinationRecommendations } from '@/components/DestinationRecommendati
 import { ItineraryMapView } from '@/components/ItineraryMapView'
 import { generateItinerary, generatePackingList, MissingApiKeyError, type ItineraryOptions, type PackingListOptions, type PackingListItem } from '@/lib/api'
 import { toast } from 'sonner'
+import { useItinerarySearchHistory } from '@/hooks/use-search-history'
 
 export function AIPlanner() {
   const [destination, setDestination] = useState('')
@@ -26,6 +27,7 @@ export function AIPlanner() {
   const [packingLoading, setPackingLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showSetupModal, setShowSetupModal] = useState(false)
+  const { history, addSearch, clearHistory } = useItinerarySearchHistory()
 
   const handleGenerate = async () => {
     if (!destination.trim()) {
@@ -49,6 +51,15 @@ export function AIPlanner() {
     try {
       const result = await generateItinerary(options)
       setItinerary(result)
+      
+      addSearch({
+        destination,
+        duration: parseInt(duration),
+        travelStyle,
+        budget,
+        groupType,
+        pace,
+      })
     } catch (err) {
       if (err instanceof MissingApiKeyError) {
         setShowSetupModal(true)
@@ -59,6 +70,15 @@ export function AIPlanner() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadFromHistory = (item: typeof history[0]) => {
+    setDestination(item.destination)
+    setDuration(item.duration.toString())
+    setTravelStyle(item.travelStyle)
+    setBudget(item.budget)
+    setGroupType(item.groupType)
+    setPace(item.pace)
   }
 
   const handleGeneratePackingList = async () => {
@@ -232,6 +252,42 @@ export function AIPlanner() {
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
                   <Warning size={20} weight="fill" />
                   <p className="text-sm">{error}</p>
+                </div>
+              )}
+
+              {history.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ClockCounterClockwise size={20} className="text-muted-foreground" weight="fill" />
+                      <h3 className="text-sm font-semibold text-muted-foreground">Recent Itineraries</h3>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearHistory}
+                      className="gap-2 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash size={16} />
+                      Clear
+                    </Button>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {history.map((item) => (
+                      <Button
+                        key={item.id}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => loadFromHistory(item)}
+                        className="gap-2"
+                      >
+                        <span className="font-semibold">{item.destination}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {item.duration}d • {item.travelStyle}
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               )}
 

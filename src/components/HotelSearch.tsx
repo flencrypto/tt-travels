@@ -5,10 +5,11 @@ import { Label } from '@/components/ui/label'
 import { searchHotels, MissingApiKeyError } from '@/lib/api'
 import type { HotelOffer, Trip, SavedHotel } from '@/lib/types'
 import { toast } from 'sonner'
-import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight, House, ListBullets, MapTrifold } from '@phosphor-icons/react'
+import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight, House, ListBullets, MapTrifold, ClockCounterClockwise, Trash } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format, differenceInDays } from 'date-fns'
 import { useKV } from '@github/spark/hooks'
+import { useHotelSearchHistory } from '@/hooks/use-search-history'
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ export function HotelSearch() {
   const [trips, setTrips] = useKV<Trip[]>('trips', [])
   const [showTripDialog, setShowTripDialog] = useState(false)
   const [selectedHotel, setSelectedHotel] = useState<HotelOffer | null>(null)
+  const { history, addSearch, clearHistory } = useHotelSearchHistory()
 
   const handleSearch = async () => {
     if (!cityCode || !checkInDate || !checkOutDate) {
@@ -61,6 +63,14 @@ export function HotelSearch() {
       const availableOffers = offers.filter(offer => offer.available && offer.offers && offer.offers.length > 0)
       setResults(availableOffers)
       
+      addSearch({
+        cityCode: cityCode.toUpperCase(),
+        checkInDate,
+        checkOutDate,
+        adults: parseInt(adults) || 1,
+        provider,
+      })
+      
       if (availableOffers.length === 0) {
         toast.info(`No ${provider === 'hotels' ? 'hotels' : 'Airbnb listings'} found for your search`)
       } else {
@@ -75,6 +85,14 @@ export function HotelSearch() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadFromHistory = (item: typeof history[0]) => {
+    setCityCode(item.cityCode)
+    setCheckInDate(item.checkInDate)
+    setCheckOutDate(item.checkOutDate)
+    setAdults(item.adults.toString())
+    setProvider(item.provider)
   }
 
   const handleSaveToTrip = (tripId: string) => {
@@ -182,6 +200,43 @@ export function HotelSearch() {
           </Button>
         </div>
       </div>
+
+      {history.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClockCounterClockwise size={20} className="text-muted-foreground" weight="fill" />
+              <h3 className="text-sm font-semibold text-muted-foreground">Recent Searches</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearHistory}
+              className="gap-2 text-muted-foreground hover:text-destructive"
+            >
+              <Trash size={16} />
+              Clear
+            </Button>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {history.map((item) => (
+              <Button
+                key={item.id}
+                variant="outline"
+                size="sm"
+                onClick={() => loadFromHistory(item)}
+                className="gap-2"
+              >
+                {item.provider === 'hotels' ? <Buildings size={14} /> : <House size={14} />}
+                <span className="font-mono text-xs">{item.cityCode}</span>
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(item.checkInDate), 'MMM d')} - {format(new Date(item.checkOutDate), 'MMM d')}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="space-y-4">

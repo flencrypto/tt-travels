@@ -5,10 +5,11 @@ import { Label } from '@/components/ui/label'
 import { searchFlights, MissingApiKeyError } from '@/lib/api'
 import type { FlightOffer, Trip, SavedFlight } from '@/lib/types'
 import { toast } from 'sonner'
-import { AirplaneTilt, MagnifyingGlass, Clock, CurrencyDollar, Heart, HeartStraight } from '@phosphor-icons/react'
+import { AirplaneTilt, MagnifyingGlass, Clock, CurrencyDollar, Heart, HeartStraight, ClockCounterClockwise, Trash } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format } from 'date-fns'
 import { useKV } from '@github/spark/hooks'
+import { useFlightSearchHistory } from '@/hooks/use-search-history'
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ export function FlightSearch() {
   const [trips, setTrips] = useKV<Trip[]>('trips', [])
   const [showTripDialog, setShowTripDialog] = useState(false)
   const [selectedFlight, setSelectedFlight] = useState<FlightOffer | null>(null)
+  const { history, addSearch, clearHistory } = useFlightSearchHistory()
 
   const handleSearch = async () => {
     if (!origin || !destination || !departureDate) {
@@ -50,6 +52,14 @@ export function FlightSearch() {
 
       setResults(offers)
       
+      addSearch({
+        origin: origin.toUpperCase(),
+        destination: destination.toUpperCase(),
+        departureDate,
+        returnDate,
+        adults: parseInt(adults) || 1,
+      })
+      
       if (offers.length === 0) {
         toast.info('No flights found for your search')
       } else {
@@ -64,6 +74,14 @@ export function FlightSearch() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadFromHistory = (item: typeof history[0]) => {
+    setOrigin(item.origin)
+    setDestination(item.destination)
+    setDepartureDate(item.departureDate)
+    setReturnDate(item.returnDate || '')
+    setAdults(item.adults.toString())
   }
 
   const formatDuration = (duration: string) => {
@@ -175,6 +193,43 @@ export function FlightSearch() {
           </Button>
         </div>
       </div>
+
+      {history.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClockCounterClockwise size={20} className="text-muted-foreground" weight="fill" />
+              <h3 className="text-sm font-semibold text-muted-foreground">Recent Searches</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearHistory}
+              className="gap-2 text-muted-foreground hover:text-destructive"
+            >
+              <Trash size={16} />
+              Clear
+            </Button>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {history.map((item) => (
+              <Button
+                key={item.id}
+                variant="outline"
+                size="sm"
+                onClick={() => loadFromHistory(item)}
+                className="gap-2"
+              >
+                <span className="font-mono text-xs">{item.origin} → {item.destination}</span>
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(item.departureDate), 'MMM d')}
+                  {item.returnDate && ` - ${format(new Date(item.returnDate), 'MMM d')}`}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="space-y-4">
