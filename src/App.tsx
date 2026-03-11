@@ -14,6 +14,7 @@ import { Bookings } from './pages/Bookings'
 import { DestinationDetail } from './pages/DestinationDetail'
 import { Toaster } from './components/ui/sonner'
 import { useClerkSync } from './hooks/use-clerk-sync'
+import { useTheme } from './hooks/use-theme'
 
 function AppContent() {
   const location = useLocation()
@@ -55,6 +56,7 @@ function AppContent() {
 
 function App() {
   useClerkSync()
+  useTheme()
   
   return (
     <BrowserRouter>
