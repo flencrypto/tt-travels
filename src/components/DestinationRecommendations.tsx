@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Compass, Sparkle, MapPin, Tag } from '@phosphor-icons/react'
+import { useNavigate } from 'react-router-dom'
+import { Compass, Sparkle, MapPin, Tag, BookOpen } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -34,6 +35,7 @@ const CLIMATE_OPTIONS = [
 ]
 
 export function DestinationRecommendations() {
+  const navigate = useNavigate()
   const [selectedInterests, setSelectedInterests] = useState<string[]>([])
   const [budget, setBudget] = useState('moderate')
   const [travelStyle, setTravelStyle] = useState('balanced')
@@ -265,6 +267,15 @@ export function DestinationRecommendations() {
                       ))}
                     </ul>
                   </div>
+
+                  <Button
+                    onClick={() => navigate(`/explore/${encodeURIComponent(rec.destination)}`)}
+                    className="w-full gap-2 mt-2"
+                    variant="default"
+                  >
+                    <BookOpen size={20} weight="fill" />
+                    View Full Travel Guide
+                  </Button>
                 </CardContent>
               </Card>
             ))}
