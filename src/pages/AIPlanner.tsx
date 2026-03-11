@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkle, Warning, Backpack, Compass } from '@phosphor-icons/react'
+import { Sparkle, Warning, Backpack, Compass, MapTrifold } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SetupModal } from '@/components/SetupModal'
 import { PackingList } from '@/components/PackingList'
 import { DestinationRecommendations } from '@/components/DestinationRecommendations'
+import { ItineraryMapView } from '@/components/ItineraryMapView'
 import { generateItinerary, generatePackingList, MissingApiKeyError, type ItineraryOptions, type PackingListOptions, type PackingListItem } from '@/lib/api'
 import { toast } from 'sonner'
 
@@ -277,35 +278,50 @@ export function AIPlanner() {
           </Card>
 
           {(itinerary || packingList.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-8">
               {itinerary && (
-                <Card className="glass-surface lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Your Personalized Itinerary</CardTitle>
-                    <CardDescription>
-                      {duration}-day {travelStyle} travel plan for {destination}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed">
-                      {itinerary}
-                    </pre>
-                  </CardContent>
-                </Card>
+                <>
+                  <Card className="glass-surface">
+                    <CardHeader>
+                      <CardTitle>Your Personalized Itinerary</CardTitle>
+                      <CardDescription>
+                        {duration}-day {travelStyle} travel plan for {destination}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed">
+                        {itinerary}
+                      </pre>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="glass-surface">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <MapTrifold size={24} className="text-primary" weight="fill" />
+                        <CardTitle>Itinerary Map View</CardTitle>
+                      </div>
+                      <CardDescription>
+                        Interactive map showing all recommended locations from your itinerary
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ItineraryMapView itinerary={itinerary} destination={destination} />
+                    </CardContent>
+                  </Card>
+                </>
               )}
 
               {packingList.length > 0 && (
-                <div className="lg:col-span-2">
-                  <PackingList
-                    destination={destination}
-                    duration={parseInt(duration)}
-                    travelStyle={travelStyle}
-                    budget={budget}
-                    groupType={groupType}
-                    items={packingList}
-                    onItemsChange={setPackingList}
-                  />
-                </div>
+                <PackingList
+                  destination={destination}
+                  duration={parseInt(duration)}
+                  travelStyle={travelStyle}
+                  budget={budget}
+                  groupType={groupType}
+                  items={packingList}
+                  onItemsChange={setPackingList}
+                />
               )}
             </div>
           )}
