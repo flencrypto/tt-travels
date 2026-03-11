@@ -12,9 +12,18 @@ import "./index.css"
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
+if (!publishableKey) {
+  throw new Error('Missing Clerk Publishable Key')
+}
+
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <ClerkProvider publishableKey={publishableKey} afterSignOutUrl="/">
+    <ClerkProvider 
+      publishableKey={publishableKey} 
+      afterSignOutUrl="/"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/setup"
+    >
       <App />
     </ClerkProvider>
    </ErrorBoundary>
