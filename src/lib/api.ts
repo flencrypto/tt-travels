@@ -7,7 +7,16 @@ export class MissingApiKeyError extends Error {
   }
 }
 
-export async function generateItinerary(destination: string): Promise<string> {
+export interface ItineraryOptions {
+  destination: string
+  duration: number
+  travelStyle: string
+  budget: string
+  groupType: string
+  pace: string
+}
+
+export async function generateItinerary(options: ItineraryOptions): Promise<string> {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY
 
   if (!apiKey) {
@@ -15,6 +24,56 @@ export async function generateItinerary(destination: string): Promise<string> {
   }
 
   const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
+
+  const systemPrompt = 'You are a helpful travel assistant. Create detailed, practical travel itineraries with day-by-day activities, local tips, and recommendations. Tailor your suggestions to the traveler\'s preferences, budget, and travel style.'
+
+  const travelStyleDescriptions: Record<string, string> = {
+    adventure: 'outdoor activities, hiking, extreme sports, and adventurous experiences',
+    relaxation: 'spa visits, beach time, leisurely activities, and stress-free experiences',
+    culture: 'museums, historical sites, art galleries, and cultural immersion',
+    food: 'local cuisine, food tours, cooking classes, and culinary experiences',
+    nightlife: 'bars, clubs, entertainment venues, and evening activities',
+    nature: 'parks, gardens, wildlife, and natural attractions',
+    photography: 'scenic viewpoints, photo opportunities, and visually stunning locations',
+    shopping: 'markets, boutiques, shopping districts, and local crafts',
+    balanced: 'a well-rounded mix of various activities and experiences',
+  }
+
+  const budgetDescriptions: Record<string, string> = {
+    budget: 'budget-friendly options, free attractions, affordable dining, and money-saving tips',
+    moderate: 'mid-range options with a balance of value and quality',
+    luxury: 'premium experiences, fine dining, luxury accommodations, and exclusive activities',
+  }
+
+  const groupDescriptions: Record<string, string> = {
+    solo: 'solo traveler with opportunities to meet people and safe activities',
+    couple: 'romantic couple with intimate and memorable experiences',
+    family: 'family with children, including kid-friendly activities and practical considerations',
+    friends: 'group of friends with social and fun activities',
+  }
+
+  const paceDescriptions: Record<string, string> = {
+    relaxed: 'a relaxed pace with plenty of downtime and flexibility',
+    moderate: 'a balanced pace with structured activities and some free time',
+    packed: 'an action-packed schedule maximizing experiences each day',
+  }
+
+  const userPrompt = `Create a detailed ${options.duration}-day travel itinerary for ${options.destination}.
+
+Travel Preferences:
+- Travel Style: Focus on ${travelStyleDescriptions[options.travelStyle] || 'a balanced experience'}
+- Budget Level: ${budgetDescriptions[options.budget] || 'moderate pricing'}
+- Group Type: Traveling as ${groupDescriptions[options.groupType] || 'solo'}
+- Pace: ${paceDescriptions[options.pace] || 'moderate'}
+
+Please structure the itinerary with:
+1. Day-by-day breakdown with morning, afternoon, and evening activities
+2. Specific attraction and restaurant recommendations
+3. Practical tips (transportation, booking advice, timing)
+4. Estimated costs where relevant
+5. Local insider tips and cultural notes
+
+Make the itinerary detailed, actionable, and personalized to these preferences.`
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -28,11 +87,11 @@ export async function generateItinerary(destination: string): Promise<string> {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful travel assistant. Create detailed, practical travel itineraries with day-by-day activities, local tips, and recommendations.',
+            content: systemPrompt,
           },
           {
             role: 'user',
-            content: `Create a detailed 3-day travel itinerary for ${destination}. Include must-see attractions, local food recommendations, and practical tips.`,
+            content: userPrompt,
           },
         ],
       }),

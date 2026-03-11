@@ -35,11 +35,11 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Success criteria**: Successfully fetches and displays prices for multiple dates, clearly identifies lowest price, shows visual comparison with color-coded bars, displays price change trends
 
 ### AI Trip Planner
-- **Functionality**: Generate personalized itineraries using OpenAI based on destination input
-- **Purpose**: Leverage AI to create comprehensive travel plans instantly
-- **Trigger**: User navigates to AI Planner, enters destination, clicks generate or presses Enter
-- **Progression**: Enter destination → validate input → show loading state → call OpenAI API → display formatted itinerary → option to regenerate
-- **Success criteria**: Returns well-formatted itinerary in <5 seconds with proper error handling and API key validation
+- **Functionality**: Generate personalized itineraries using OpenAI with extensive customization options including trip duration, travel style, budget level, group type, and travel pace
+- **Purpose**: Leverage AI to create highly personalized and comprehensive travel plans tailored to individual preferences and circumstances
+- **Trigger**: User navigates to AI Planner, enters destination and preferences, clicks generate or presses Enter
+- **Progression**: Enter destination → select duration (1-14 days) → choose travel style (adventure, relaxation, culture, food, nightlife, nature, photography, shopping, balanced) → select budget level (budget, moderate, luxury) → specify group type (solo, couple, family, friends) → set travel pace (relaxed, moderate, packed) → validate input → show loading state → call OpenAI API with detailed prompt → display formatted personalized itinerary → option to regenerate with different options
+- **Success criteria**: Returns well-formatted, highly personalized itinerary in <10 seconds with proper error handling, API key validation, and itinerary reflects all selected preferences accurately
 
 ### Location Exploration with Weather
 - **Functionality**: Request geolocation, display map centered on user, fetch and show current weather with unit preferences
