@@ -339,6 +339,124 @@ export async function searchHotels(params: HotelSearchParams): Promise<HotelOffe
   }
 }
 
+export interface PackingListOptions {
+  destination: string
+  duration: number
+  travelStyle: string
+  budget: string
+  groupType: string
+  season?: string
+}
+
+export interface PackingListItem {
+  id: string
+  name: string
+  category: string
+  checked: boolean
+}
+
+export async function generatePackingList(options: PackingListOptions): Promise<PackingListItem[]> {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+
+  if (!apiKey) {
+    throw new MissingApiKeyError('OpenAI API key is not configured')
+  }
+
+  const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
+
+  const travelStyleDescriptions: Record<string, string> = {
+    adventure: 'outdoor activities, hiking, extreme sports',
+    relaxation: 'spa, beach, leisure',
+    culture: 'museums, historical sites, art galleries',
+    food: 'local cuisine, food tours, dining',
+    nightlife: 'bars, clubs, evening activities',
+    nature: 'parks, gardens, wildlife',
+    photography: 'scenic viewpoints, photography',
+    shopping: 'markets, boutiques, shopping',
+    balanced: 'a balanced mix of activities',
+  }
+
+  const systemPrompt = 'You are a travel packing expert. Generate comprehensive, practical packing lists tailored to the destination, trip duration, travel style, and group type. Organize items by category. Return ONLY a valid JSON object with a "items" property containing an array of objects with "name" and "category" properties.'
+
+  const userPrompt = `Create a detailed packing list for a ${options.duration}-day trip to ${options.destination}.
+
+Travel Details:
+- Travel Style: ${travelStyleDescriptions[options.travelStyle] || 'balanced'}
+- Budget Level: ${options.budget}
+- Group Type: ${options.groupType}
+${options.season ? `- Season: ${options.season}` : ''}
+
+Categories to include:
+- Essentials (passport, documents, wallet, etc.)
+- Clothing (appropriate for destination climate and activities)
+- Toiletries
+- Electronics
+- Health & Safety
+- Activities & Recreation (specific to travel style)
+- Miscellaneous
+
+Return ONLY a JSON object in this exact format:
+{
+  "items": [
+    {"name": "Passport", "category": "Essentials"},
+    {"name": "T-shirts", "category": "Clothing"},
+    ...more items
+  ]
+}
+
+Be specific and practical. Consider the destination's climate, culture, and the travel style.`
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
+        response_format: { type: 'json_object' },
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const content = data.choices[0]?.message?.content?.trim()
+    
+    if (!content) {
+      throw new Error('No packing list generated')
+    }
+
+    const parsed = JSON.parse(content)
+    const items = parsed.items || []
+
+    return items.map((item: { name: string; category: string }, index: number) => ({
+      id: `item-${index}`,
+      name: item.name,
+      category: item.category,
+      checked: false,
+    }))
+  } catch (error) {
+    if (error instanceof MissingApiKeyError) {
+      throw error
+    }
+    throw new Error(`Failed to generate packing list: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
 export function isIntegrationConfigured(integration: Integration): boolean {
   if (integration.id === 'geolocation') {
     return 'geolocation' in navigator

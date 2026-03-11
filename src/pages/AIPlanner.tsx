@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Sparkle, Warning } from '@phosphor-icons/react'
+import { Sparkle, Warning, Backpack } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SetupModal } from '@/components/SetupModal'
-import { generateItinerary, MissingApiKeyError, type ItineraryOptions } from '@/lib/api'
+import { PackingList } from '@/components/PackingList'
+import { generateItinerary, generatePackingList, MissingApiKeyError, type ItineraryOptions, type PackingListOptions, type PackingListItem } from '@/lib/api'
+import { toast } from 'sonner'
 
 export function AIPlanner() {
   const [destination, setDestination] = useState('')
@@ -16,7 +18,9 @@ export function AIPlanner() {
   const [groupType, setGroupType] = useState('solo')
   const [pace, setPace] = useState('moderate')
   const [itinerary, setItinerary] = useState<string | null>(null)
+  const [packingList, setPackingList] = useState<PackingListItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [packingLoading, setPackingLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showSetupModal, setShowSetupModal] = useState(false)
 
@@ -51,6 +55,38 @@ export function AIPlanner() {
       }
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGeneratePackingList = async () => {
+    if (!destination.trim()) {
+      toast.error('Please enter a destination first')
+      return
+    }
+
+    setPackingLoading(true)
+
+    const options: PackingListOptions = {
+      destination,
+      duration: parseInt(duration),
+      travelStyle,
+      budget,
+      groupType,
+    }
+
+    try {
+      const result = await generatePackingList(options)
+      setPackingList(result)
+      toast.success('Packing list generated!')
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) {
+        setShowSetupModal(true)
+        toast.error('OpenAI API key is not configured')
+      } else {
+        toast.error(err instanceof Error ? err.message : 'Failed to generate packing list')
+      }
+    } finally {
+      setPackingLoading(false)
     }
   }
 
@@ -183,41 +219,80 @@ export function AIPlanner() {
             </div>
           )}
 
-          <Button
-            onClick={handleGenerate}
-            disabled={loading || !destination.trim()}
-            className="w-full gap-2"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Sparkle size={20} className="animate-spin" />
-                Generating Your Personalized Itinerary...
-              </>
-            ) : (
-              <>
-                <Sparkle size={20} weight="fill" />
-                Generate Custom Itinerary
-              </>
-            )}
-          </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Button
+              onClick={handleGenerate}
+              disabled={loading || !destination.trim()}
+              className="gap-2"
+              size="lg"
+            >
+              {loading ? (
+                <>
+                  <Sparkle size={20} className="animate-spin" />
+                  Generating Itinerary...
+                </>
+              ) : (
+                <>
+                  <Sparkle size={20} weight="fill" />
+                  Generate Itinerary
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleGeneratePackingList}
+              disabled={packingLoading || !destination.trim()}
+              className="gap-2"
+              size="lg"
+              variant="secondary"
+            >
+              {packingLoading ? (
+                <>
+                  <Backpack size={20} className="animate-spin" />
+                  Generating Packing List...
+                </>
+              ) : (
+                <>
+                  <Backpack size={20} weight="fill" />
+                  Generate Packing List
+                </>
+              )}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      {itinerary && (
-        <Card className="max-w-4xl mx-auto glass-surface">
-          <CardHeader>
-            <CardTitle>Your Personalized Itinerary</CardTitle>
-            <CardDescription>
-              {duration}-day {travelStyle} travel plan for {destination}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed">
-              {itinerary}
-            </pre>
-          </CardContent>
-        </Card>
+      {(itinerary || packingList.length > 0) && (
+        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {itinerary && (
+            <Card className="glass-surface lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Your Personalized Itinerary</CardTitle>
+                <CardDescription>
+                  {duration}-day {travelStyle} travel plan for {destination}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed">
+                  {itinerary}
+                </pre>
+              </CardContent>
+            </Card>
+          )}
+
+          {packingList.length > 0 && (
+            <div className="lg:col-span-2">
+              <PackingList
+                destination={destination}
+                duration={parseInt(duration)}
+                travelStyle={travelStyle}
+                budget={budget}
+                groupType={groupType}
+                items={packingList}
+                onItemsChange={setPackingList}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       <SetupModal open={showSetupModal} onOpenChange={setShowSetupModal} />
