@@ -71,12 +71,12 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Progression**: Click upload → select multiple files → generate object URLs → display in 3-column responsive grid → view uploaded photos
 - **Success criteria**: Multiple file selection works, images render correctly, grid adapts to screen size
 
-### Settings Management
-- **Functionality**: Configure display name and temperature unit preference (Celsius/Fahrenheit)
-- **Purpose**: Personalize user experience and control data display formats
-- **Trigger**: Navigate to Settings, modify fields, click save
-- **Progression**: View current settings → modify name or unit → click save → persist to localStorage → show confirmation message
-- **Success criteria**: Settings persist across sessions, weather display respects unit preference immediately
+### Settings Management with API Key Configuration
+- **Functionality**: Configure display name, temperature unit preference (Celsius/Fahrenheit), dark mode toggle, and manage API keys for third-party services (OpenAI, Amadeus, OpenWeather, Airbnb) with validation and connection testing
+- **Purpose**: Personalize user experience, control data display formats, and securely manage API credentials locally for enhanced platform features
+- **Trigger**: Navigate to Settings, modify preferences or API keys, optionally test connections, click save
+- **Progression**: View current settings → modify name, unit, or theme → configure API keys (OpenAI for AI features, Amadeus for flights/hotels, OpenWeather for weather, Airbnb for accommodations) → toggle key visibility with show/hide buttons → optionally test individual API connections or test all at once → receive validation feedback with success/error badges and detailed messages → save all changes → persist to useKV storage → show confirmation message
+- **Success criteria**: Settings and API keys persist across sessions using Spark's KV store, weather display respects unit preference immediately, theme changes apply in real-time, API key inputs mask sensitive data by default with toggle visibility, validation tests actual API endpoints and returns detailed status (verified/failed with specific error messages), "Test All" button runs all validations in parallel and summarizes results, privacy notice clarifies local-only storage, OpenAI key validation confirms sk- prefix and tests /v1/models endpoint, Amadeus validation authenticates and retrieves access token, all validation results display with appropriate icons (checkmark/X) and color-coded badges
 
 ### User Authentication (Clerk)
 - **Functionality**: Complete authentication system with sign-in, sign-up, and user profile management powered by Clerk
