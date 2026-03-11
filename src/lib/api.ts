@@ -16,17 +16,16 @@ export interface ItineraryOptions {
   pace: string
 }
 
-export async function generateItinerary(options: ItineraryOptions): Promise<string> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-
-  if (!apiKey) {
-    throw new MissingApiKeyError('OpenAI API key is not configured')
+async function getStoredAPIKeys() {
+  try {
+    const keys = await spark.kv.get<{ openai_api_key?: string }>('tt-travels-api-keys')
+    return keys
+  } catch {
+    return null
   }
+}
 
-  const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
-
-  const systemPrompt = 'You are a helpful travel assistant. Create detailed, practical travel itineraries with day-by-day activities, local tips, and recommendations. Tailor your suggestions to the traveler\'s preferences, budget, and travel style.'
-
+export async function generateItinerary(options: ItineraryOptions): Promise<string> {
   const travelStyleDescriptions: Record<string, string> = {
     adventure: 'outdoor activities, hiking, extreme sports, and adventurous experiences',
     relaxation: 'spa visits, beach time, leisurely activities, and stress-free experiences',
@@ -58,7 +57,9 @@ export async function generateItinerary(options: ItineraryOptions): Promise<stri
     packed: 'an action-packed schedule maximizing experiences each day',
   }
 
-  const userPrompt = `Create a detailed ${options.duration}-day travel itinerary for ${options.destination}.
+  const prompt = spark.llmPrompt`You are a helpful travel assistant. Create detailed, practical travel itineraries with day-by-day activities, local tips, and recommendations. Tailor your suggestions to the traveler's preferences, budget, and travel style.
+
+Create a detailed ${options.duration}-day travel itinerary for ${options.destination}.
 
 Travel Preferences:
 - Travel Style: Focus on ${travelStyleDescriptions[options.travelStyle] || 'a balanced experience'}
@@ -76,37 +77,9 @@ Please structure the itinerary with:
 Make the itinerary detailed, actionable, and personalized to these preferences.`
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.choices[0]?.message?.content?.trim() || 'No itinerary generated'
+    const result = await spark.llm(prompt, 'gpt-4o')
+    return result.trim() || 'No itinerary generated'
   } catch (error) {
-    if (error instanceof MissingApiKeyError) {
-      throw error
-    }
     throw new Error(`Failed to generate itinerary: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
@@ -431,14 +404,6 @@ async function fetchDestinationWeather(destination: string): Promise<Destination
 }
 
 export async function generatePackingList(options: PackingListOptions): Promise<PackingListItem[]> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-
-  if (!apiKey) {
-    throw new MissingApiKeyError('OpenAI API key is not configured')
-  }
-
-  const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
-
   const weather = await fetchDestinationWeather(options.destination)
 
   const travelStyleDescriptions: Record<string, string> = {
@@ -453,8 +418,6 @@ export async function generatePackingList(options: PackingListOptions): Promise<
     balanced: 'a balanced mix of activities',
   }
 
-  const systemPrompt = 'You are a travel packing expert. Generate comprehensive, practical packing lists tailored to the destination, trip duration, travel style, group type, and current weather conditions. Organize items by category. Mark weather-specific items with a weatherBased flag and provide a brief reason. Return ONLY a valid JSON object with an "items" property containing an array of objects.'
-
   const weatherContext = weather 
     ? `\n\nCurrent Weather in ${options.destination}:
 - Temperature: ${weather.temperature}${weather.unit}
@@ -463,7 +426,9 @@ export async function generatePackingList(options: PackingListOptions): Promise<
 IMPORTANT: Based on these weather conditions, recommend appropriate weather-specific items and mark them with "weatherBased": true and include a "reason" field explaining why (e.g., "Heavy rain expected", "Cold temperatures", "Hot weather"). This is critical for helping travelers prepare for the actual conditions.`
     : ''
 
-  const userPrompt = `Create a detailed packing list for a ${options.duration}-day trip to ${options.destination}.
+  const prompt = spark.llmPrompt`You are a travel packing expert. Generate comprehensive, practical packing lists tailored to the destination, trip duration, travel style, group type, and current weather conditions. Organize items by category. Mark weather-specific items with a weatherBased flag and provide a brief reason. Return ONLY a valid JSON object with an "items" property containing an array of objects.
+
+Create a detailed packing list for a ${options.duration}-day trip to ${options.destination}.
 
 Travel Details:
 - Travel Style: ${travelStyleDescriptions[options.travelStyle] || 'balanced'}
@@ -494,40 +459,8 @@ Return ONLY a JSON object in this exact format:
 Be specific and practical. Consider the destination's climate, culture, travel style, and especially the current weather conditions. Include 5-10 weather-specific recommendations marked with weatherBased: true.`
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
-        response_format: { type: 'json_object' },
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    const content = data.choices[0]?.message?.content?.trim()
-    
-    if (!content) {
-      throw new Error('No packing list generated')
-    }
-
-    const parsed = JSON.parse(content)
+    const result = await spark.llm(prompt, 'gpt-4o', true)
+    const parsed = JSON.parse(result)
     const items = parsed.items || []
 
     return items.map((item: { name: string; category: string; weatherBased?: boolean; reason?: string }, index: number) => ({
@@ -539,9 +472,6 @@ Be specific and practical. Consider the destination's climate, culture, travel s
       reason: item.reason,
     }))
   } catch (error) {
-    if (error instanceof MissingApiKeyError) {
-      throw error
-    }
     throw new Error(`Failed to generate packing list: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
@@ -577,17 +507,9 @@ export async function generateWeatherActivities(
   weatherCondition: string,
   unit: string
 ): Promise<WeatherActivity[]> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+  const prompt = spark.llmPrompt`You are a knowledgeable travel expert who recommends activities based on current weather conditions and destinations. Provide practical, specific, and localized recommendations that consider both weather suitability and the unique character of each destination. Return ONLY valid JSON.
 
-  if (!apiKey) {
-    throw new MissingApiKeyError('OpenAI API key is not configured')
-  }
-
-  const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo'
-
-  const systemPrompt = 'You are a knowledgeable travel expert who recommends activities based on current weather conditions and destinations. Provide practical, specific, and localized recommendations that consider both weather suitability and the unique character of each destination. Return ONLY valid JSON.'
-
-  const userPrompt = `Generate 6-8 weather-appropriate activity recommendations for ${destination} given the current conditions:
+Generate 6-8 weather-appropriate activity recommendations for ${destination} given the current conditions:
 - Temperature: ${temperature}${unit}
 - Weather: ${weatherCondition}
 
@@ -616,47 +538,83 @@ Return ONLY a JSON object in this exact format:
 Be specific to ${destination} - mention actual landmarks, neighborhoods, and local favorites. Consider the weather when rating suitability.`
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
-        response_format: { type: 'json_object' },
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    const content = data.choices[0]?.message?.content?.trim()
-
-    if (!content) {
-      throw new Error('No activity recommendations generated')
-    }
-
-    const parsed = JSON.parse(content)
+    const result = await spark.llm(prompt, 'gpt-4o', true)
+    const parsed = JSON.parse(result)
     const activities = parsed.activities || []
 
     return activities as WeatherActivity[]
   } catch (error) {
-    if (error instanceof MissingApiKeyError) {
-      throw error
-    }
     throw new Error(`Failed to generate activity recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+export interface DestinationRecommendation {
+  destination: string
+  country: string
+  description: string
+  bestFor: string[]
+  seasonInfo: string
+  estimatedBudget: string
+  highlights: string[]
+  travelTips: string[]
+}
+
+export async function generateSmartDestinationRecommendations(params: {
+  interests: string[]
+  budget?: string
+  travelStyle?: string
+  duration?: number
+  climate?: string
+}): Promise<DestinationRecommendation[]> {
+  const interestsStr = params.interests.join(', ')
+  const budgetStr = params.budget || 'moderate'
+  const styleStr = params.travelStyle || 'balanced'
+  const durationStr = params.duration ? `${params.duration} days` : 'flexible'
+  const climateStr = params.climate || 'any'
+
+  const prompt = spark.llmPrompt`You are an expert travel advisor with deep knowledge of global destinations. Provide personalized, detailed destination recommendations based on traveler preferences.
+
+Generate 5 destination recommendations matching these criteria:
+- Interests: ${interestsStr}
+- Budget Level: ${budgetStr}
+- Travel Style: ${styleStr}
+- Trip Duration: ${durationStr}
+- Preferred Climate: ${climateStr}
+
+For each destination, provide:
+1. Specific destination name and country
+2. Compelling description (2-3 sentences) explaining why it matches their interests
+3. Array of specific activities/experiences it's best for
+4. Current season information and best time to visit
+5. Estimated daily budget range in USD
+6. 4-5 must-see highlights or unique experiences
+7. 3-4 practical travel tips
+
+Return ONLY a JSON object in this exact format:
+{
+  "recommendations": [
+    {
+      "destination": "Kyoto",
+      "country": "Japan",
+      "description": "Ancient capital blending traditional temples with modern culture, perfect for cultural immersion and photography",
+      "bestFor": ["Temple visits", "Traditional tea ceremonies", "Cherry blossom viewing", "Japanese cuisine"],
+      "seasonInfo": "Best in spring (March-May) and fall (September-November) for mild weather and stunning foliage",
+      "estimatedBudget": "$80-150 per day for moderate travelers",
+      "highlights": ["Fushimi Inari Shrine", "Arashiyama Bamboo Grove", "Kinkaku-ji Golden Pavilion", "Gion geisha district", "Nishiki Market"],
+      "travelTips": ["Get a JR Pass for unlimited train travel", "Visit temples early morning to avoid crowds", "Try kaiseki dining for authentic experience", "Learn basic Japanese phrases"]
+    }
+  ]
+}
+
+Ensure destinations are diverse geographically, culturally distinct, and genuinely match the specified interests and constraints.`
+
+  try {
+    const result = await spark.llm(prompt, 'gpt-4o', true)
+    const parsed = JSON.parse(result)
+    const recommendations = parsed.recommendations || []
+
+    return recommendations as DestinationRecommendation[]
+  } catch (error) {
+    throw new Error(`Failed to generate destination recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }

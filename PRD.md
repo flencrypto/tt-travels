@@ -34,12 +34,14 @@ This is a sophisticated multi-feature application with route-based navigation, e
 - **Progression**: Enter search criteria (route/city, start date, passengers) → fetch prices for 7 consecutive days → display interactive bar chart → show min/avg/max statistics → highlight best deal → show day-by-day price changes with percentages
 - **Success criteria**: Successfully fetches and displays prices for multiple dates, clearly identifies lowest price, shows visual comparison with color-coded bars, displays price change trends
 
-### AI Trip Planner with Packing Lists
-- **Functionality**: Generate personalized itineraries and weather-based packing lists using OpenAI with extensive customization options including trip duration, travel style, budget level, group type, and travel pace
-- **Purpose**: Leverage AI to create highly personalized and comprehensive travel plans tailored to individual preferences and circumstances, plus practical packing recommendations based on real-time weather data
-- **Trigger**: User navigates to AI Planner, enters destination and preferences, clicks generate itinerary or generate packing list
-- **Progression**: Enter destination → select duration (1-14 days) → choose travel style (adventure, relaxation, culture, food, nightlife, nature, photography, shopping, balanced) → select budget level (budget, moderate, luxury) → specify group type (solo, couple, family, friends) → set travel pace (relaxed, moderate, packed) → validate input → show loading state → call OpenAI API with detailed prompt → display formatted personalized itinerary and/or packing list with weather-based recommendations → option to regenerate with different options
-- **Success criteria**: Returns well-formatted, highly personalized itinerary in <10 seconds with proper error handling, API key validation, and itinerary reflects all selected preferences accurately. Packing lists include weather-specific items with badges and explanations based on current destination weather conditions fetched from Open-Meteo and geocoding via OpenStreetMap
+### AI Trip Planner with Packing Lists and Smart Destination Recommendations
+- **Functionality**: Generate personalized itineraries and weather-based packing lists using Spark's built-in LLM capabilities with extensive customization options including trip duration, travel style, budget level, group type, and travel pace. Additionally, discover perfect destinations through AI-powered smart recommendations based on interests, preferences, and constraints
+- **Purpose**: Leverage AI to create highly personalized and comprehensive travel plans tailored to individual preferences and circumstances, plus practical packing recommendations based on real-time weather data, and help travelers discover new destinations they'll love through intelligent matching
+- **Trigger**: User navigates to AI Planner, selects "Create Itinerary" or "Discover Destinations" tab, enters preferences, and generates content
+- **Progression**: 
+  - **Itinerary Path**: Enter destination → select duration (1-14 days) → choose travel style (adventure, relaxation, culture, food, nightlife, nature, photography, shopping, balanced) → select budget level (budget, moderate, luxury) → specify group type (solo, couple, family, friends) → set travel pace (relaxed, moderate, packed) → validate input → show loading state → call Spark LLM with detailed prompt → display formatted personalized itinerary and/or packing list with weather-based recommendations → option to regenerate with different options
+  - **Discovery Path**: Select interests (multiple checkboxes from 12 options) → choose duration, budget, travel style, and preferred climate → validate at least one interest selected → call Spark LLM for destination recommendations → display 5 curated destination cards with descriptions, best-for tags, highlights, travel tips, budget estimates, and seasonal information
+- **Success criteria**: Returns well-formatted, highly personalized itinerary in <10 seconds with proper error handling and itinerary reflects all selected preferences accurately. Packing lists include weather-specific items with badges and explanations based on current destination weather conditions fetched from Open-Meteo and geocoding via OpenStreetMap. Destination recommendations are diverse, detailed, and accurately match user interests with practical information for trip planning. All AI features now use Spark's runtime LLM API (gpt-4o model) instead of direct OpenAI API calls
 
 ### Location Exploration with Weather and Search
 - **Functionality**: Search any location worldwide using geocoding API or use current geolocation, display map centered on location, fetch and show current weather with unit preferences, and generate AI-powered destination-specific activity recommendations based on real-time weather conditions
@@ -168,6 +170,7 @@ Animations should enhance the sense of exploration and smooth transitions betwee
 - MapPin for location/explore
 - MagnifyingGlass for search functionality
 - Sparkle for AI planner and activity generation
+- Compass for destination discovery and recommendations
 - Calendar for trips
 - Camera for journal
 - Gear for settings
@@ -181,6 +184,7 @@ Animations should enhance the sense of exploration and smooth transitions betwee
 - MapTrifold for map and activities
 - Info for information and tips
 - NavigationArrow for current location actions
+- Tag for categorization and labels
 
 **Spacing**: 
 - Page padding: px-6 md:px-12
