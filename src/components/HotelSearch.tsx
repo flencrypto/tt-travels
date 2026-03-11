@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { searchHotels, MissingApiKeyError } from '@/lib/api'
 import type { HotelOffer, Trip, SavedHotel } from '@/lib/types'
 import { toast } from 'sonner'
-import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight, House } from '@phosphor-icons/react'
+import { Buildings, MagnifyingGlass, MapPin, CurrencyDollar, Star, HeartStraight, House, ListBullets, MapTrifold } from '@phosphor-icons/react'
 import { SetupModal } from './SetupModal'
 import { format, differenceInDays } from 'date-fns'
 import { useKV } from '@github/spark/hooks'
@@ -17,11 +17,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { HotelMapView } from './HotelMapView'
 
 type Provider = 'hotels' | 'airbnb'
+type ViewMode = 'list' | 'map'
 
 export function HotelSearch() {
   const [provider, setProvider] = useState<Provider>('hotels')
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [cityCode, setCityCode] = useState('')
   const [checkInDate, setCheckInDate] = useState('')
   const [checkOutDate, setCheckOutDate] = useState('')
@@ -182,10 +185,32 @@ export function HotelSearch() {
 
       {results.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">
-            Available {provider === 'hotels' ? 'Hotels' : 'Airbnb Listings'} ({results.length})
-          </h3>
-          <div className="grid gap-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold">
+              Available {provider === 'hotels' ? 'Hotels' : 'Airbnb Listings'} ({results.length})
+            </h3>
+            <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className="w-auto">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="list" className="gap-2">
+                  <ListBullets size={18} weight="bold" />
+                  List
+                </TabsTrigger>
+                <TabsTrigger value="map" className="gap-2">
+                  <MapTrifold size={18} weight="fill" />
+                  Map
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {viewMode === 'map' ? (
+            <HotelMapView 
+              hotels={results} 
+              provider={provider}
+              onSelectHotel={openSaveDialog}
+            />
+          ) : (
+            <div className="grid gap-4">
             {results.map((offer) => {
               const hotel = offer.hotel
               const bestOffer = offer.offers?.[0]
@@ -276,7 +301,8 @@ export function HotelSearch() {
                 </div>
               )
             })}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
