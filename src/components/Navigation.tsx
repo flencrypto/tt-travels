@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useTheme } from '@/hooks/use-theme'
 import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 import { SyncStatusIndicator } from '@/components/SyncStatusIndicator'
+import { ClerkSetupBanner } from '@/components/ClerkSetupBanner'
 
 const routes = [
   { path: '/dashboard', label: 'Dashboard', icon: House },
@@ -23,6 +24,7 @@ export function Navigation() {
 
   return (
     <header className="glass-surface sticky top-0 z-50 border-b">
+      <ClerkSetupBanner />
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-primary">

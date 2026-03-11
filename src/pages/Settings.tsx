@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
+import { AuthStatus } from '@/components/AuthStatus'
 import { useKV } from '@github/spark/hooks'
 import { useTheme } from '@/hooks/use-theme'
 import { useClerkSync } from '@/hooks/use-clerk-sync'
@@ -183,6 +184,10 @@ export function Settings() {
         <p className="text-muted-foreground text-lg">
           Customize your TT Travels experience
         </p>
+      </div>
+
+      <div className="max-w-2xl mx-auto">
+        <AuthStatus />
       </div>
 
       <Card className="max-w-2xl mx-auto glass-surface">

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { SignInButton, SignUpButton } from '@clerk/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ClerkSetupBanner } from '@/components/ClerkSetupBanner'
 import { 
   Sparkle, 
   MapPin, 
@@ -66,7 +67,11 @@ export function Landing() {
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,oklch(0.70_0.18_45/0.15),transparent_50%),radial-gradient(circle_at_70%_60%,oklch(0.45_0.15_250/0.1),transparent_50%)]" />
         
-        <div className="container relative mx-auto px-6 py-20 md:py-32">
+        <div className="container relative mx-auto px-6 py-12">
+          <ClerkSetupBanner />
+        </div>
+        
+        <div className="container relative mx-auto px-6 py-8 md:py-20">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent-foreground">
               <Sparkle size={16} weight="fill" />
