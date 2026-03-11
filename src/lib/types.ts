@@ -30,6 +30,7 @@ export interface APIKeys {
   amadeus_api_secret?: string
   openweather_api_key?: string
   airbnb_api_key?: string
+  openai_api_key?: string
 }
 
 export interface APIValidationResult {

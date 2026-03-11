@@ -16,6 +16,7 @@ import {
   validateAmadeusCredentials, 
   validateOpenWeatherKey, 
   validateAirbnbKey,
+  validateOpenAIKey,
   testAllConnections 
 } from '@/lib/api-validation'
 
@@ -31,6 +32,7 @@ export function Settings() {
     amadeus?: APIValidationResult
     openweather?: APIValidationResult
     airbnb?: APIValidationResult
+    openai?: APIValidationResult
   }>({})
   const [isTestingAll, setIsTestingAll] = useState(false)
   const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
@@ -100,6 +102,24 @@ export function Settings() {
     toast.info(result.message)
   }
 
+  const testOpenAIConnection = async () => {
+    if (!apiKeys?.openai_api_key) {
+      toast.error('Please enter OpenAI API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, openai: true }))
+    const result = await validateOpenAIKey(apiKeys.openai_api_key)
+    setValidationResults((prev) => ({ ...prev, openai: result }))
+    setIsTesting((prev) => ({ ...prev, openai: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
   const testAllAPIConnections = async () => {
     if (!apiKeys || Object.keys(apiKeys).length === 0) {
       toast.error('Please enter at least one API key')
@@ -115,6 +135,7 @@ export function Settings() {
       ...(results.amadeus && { amadeus: results.amadeus }),
       ...(results.openweather && { openweather: results.openweather }),
       ...(results.airbnb && { airbnb: results.airbnb }),
+      ...(results.openai && { openai: results.openai }),
     }
     
     setValidationResults(filteredResults)
@@ -429,6 +450,70 @@ export function Settings() {
             )}
             <p className="text-xs text-muted-foreground">
               Required for weather data and activity recommendations
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="openai-api-key">OpenAI API Key</Label>
+              {getValidationBadge(validationResults.openai)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="openai-api-key"
+                type={showKeys['openai_api_key'] ? 'text' : 'password'}
+                placeholder="Enter your OpenAI API key (sk-...)"
+                value={apiKeys?.openai_api_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, openai_api_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('openai_api_key')}
+              >
+                {showKeys['openai_api_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testOpenAIConnection}
+                disabled={isTesting.openai || !apiKeys?.openai_api_key}
+                className="gap-2"
+              >
+                {isTesting.openai ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.openai && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.openai.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.openai)}
+                <div>
+                  <p className="font-medium">{validationResults.openai.message}</p>
+                  {validationResults.openai.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.openai.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Required for AI-powered trip planning and recommendations
             </p>
           </div>
 

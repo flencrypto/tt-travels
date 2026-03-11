@@ -142,15 +142,87 @@ export async function validateAirbnbKey(apiKey: string): Promise<APIValidationRe
   }
 }
 
+export async function validateOpenAIKey(apiKey: string): Promise<APIValidationResult> {
+  if (!apiKey) {
+    return {
+      isValid: false,
+      message: 'API key is required',
+    }
+  }
+
+  if (!apiKey.startsWith('sk-')) {
+    return {
+      isValid: false,
+      message: 'Invalid API key format',
+      details: 'OpenAI API keys should start with "sk-"',
+    }
+  }
+
+  if (apiKey.trim().length < 40) {
+    return {
+      isValid: false,
+      message: 'API key appears to be invalid (too short)',
+    }
+  }
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/models', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+      },
+    })
+
+    if (response.ok) {
+      return {
+        isValid: true,
+        message: 'OpenAI API key verified successfully',
+        details: 'Connection to OpenAI API successful',
+      }
+    }
+
+    if (response.status === 401) {
+      const data = await response.json()
+      return {
+        isValid: false,
+        message: 'Invalid API key',
+        details: data.error?.message || 'The API key is incorrect or has been revoked',
+      }
+    }
+
+    if (response.status === 429) {
+      return {
+        isValid: false,
+        message: 'Rate limit exceeded',
+        details: 'Too many requests. Please try again later.',
+      }
+    }
+
+    return {
+      isValid: false,
+      message: `Validation failed (${response.status})`,
+      details: response.statusText,
+    }
+  } catch (error) {
+    return {
+      isValid: false,
+      message: 'Connection failed',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
 export async function testAllConnections(apiKeys: APIKeys): Promise<{
   amadeus: APIValidationResult | null
   openweather: APIValidationResult | null
   airbnb: APIValidationResult | null
+  openai: APIValidationResult | null
 }> {
   const results = {
     amadeus: null as APIValidationResult | null,
     openweather: null as APIValidationResult | null,
     airbnb: null as APIValidationResult | null,
+    openai: null as APIValidationResult | null,
   }
 
   if (apiKeys.amadeus_api_key && apiKeys.amadeus_api_secret) {
@@ -166,6 +238,10 @@ export async function testAllConnections(apiKeys: APIKeys): Promise<{
 
   if (apiKeys.airbnb_api_key) {
     results.airbnb = await validateAirbnbKey(apiKeys.airbnb_api_key)
+  }
+
+  if (apiKeys.openai_api_key) {
+    results.openai = await validateOpenAIKey(apiKeys.openai_api_key)
   }
 
   return results
