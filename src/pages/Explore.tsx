@@ -3,6 +3,7 @@ import { MapPin, ThermometerSimple, Warning, NavigationArrow } from '@phosphor-i
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ActivityRecommendations } from '@/components/ActivityRecommendations'
+import { GeoLocalRecommendations } from '@/components/GeoLocalRecommendations'
 import { WeatherSearch, type GeocodingResult } from '@/components/WeatherSearch'
 import { fetchWeather } from '@/lib/api'
 import type { Coordinates, WeatherData } from '@/lib/types'
@@ -251,6 +252,12 @@ export function Explore() {
               unit={weather.unit}
             />
           )}
+
+          <GeoLocalRecommendations
+            latitude={coordinates.lat}
+            longitude={coordinates.lng}
+            locationName={destination}
+          />
         </div>
       )}
     </div>
