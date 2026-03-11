@@ -8,31 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { generateDestinationGuide, type DestinationGuide } from '@/lib/destination-api'
-import { useKV } from '@github/spark/hooks'
-
-interface SavedDestination {
-  id: string
-  name: string
-  country: string
-  savedAt: string
-}
+import { useFavorites } from '@/hooks/use-favorites'
 
 export function DestinationDetail() {
   const { destinationName } = useParams<{ destinationName: string }>()
   const navigate = useNavigate()
   const [guide, setGuide] = useState<DestinationGuide | null>(null)
   const [loading, setLoading] = useState(true)
-  const [savedDestinations, setSavedDestinations] = useKV<SavedDestination[]>('tt-travels-saved-destinations', [])
-  const [isSaved, setIsSaved] = useState(false)
+  const { isFavorite, toggleFavorite } = useFavorites()
 
   const decodedDestination = destinationName ? decodeURIComponent(destinationName) : ''
-
-  useEffect(() => {
-    if (savedDestinations) {
-      const saved = savedDestinations.some(d => d.name === decodedDestination)
-      setIsSaved(saved)
-    }
-  }, [savedDestinations, decodedDestination])
 
   useEffect(() => {
     const loadDestinationGuide = async () => {
@@ -59,23 +44,16 @@ export function DestinationDetail() {
   const handleSaveDestination = () => {
     if (!guide) return
 
-    setSavedDestinations((current) => {
-      if (!current) current = []
-      const existing = current.some(d => d.name === guide.destination)
-      
-      if (existing) {
-        toast.success('Destination removed from favorites')
-        return current.filter(d => d.name !== guide.destination)
-      } else {
-        toast.success('Destination saved to favorites!')
-        return [...current, {
-          id: `dest-${Date.now()}`,
-          name: guide.destination,
-          country: guide.country,
-          savedAt: new Date().toISOString(),
-        }]
-      }
+    const added = toggleFavorite({
+      name: guide.destination,
+      country: guide.country,
     })
+    
+    if (added) {
+      toast.success('Destination saved to favorites!')
+    } else {
+      toast.success('Destination removed from favorites')
+    }
   }
 
   const handleShare = async () => {
@@ -139,8 +117,8 @@ export function DestinationDetail() {
               onClick={handleSaveDestination}
               className="gap-2"
             >
-              <Heart size={20} weight={isSaved ? 'fill' : 'regular'} className={isSaved ? 'text-red-500' : ''} />
-              {isSaved ? 'Saved' : 'Save'}
+              <Heart size={20} weight={isFavorite(decodedDestination) ? 'fill' : 'regular'} className={isFavorite(decodedDestination) ? 'text-red-500' : ''} />
+              {isFavorite(decodedDestination) ? 'Saved' : 'Save'}
             </Button>
             <Button
               variant="outline"

@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom'
-import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe, Ticket } from '@phosphor-icons/react'
+import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe, Ticket, Heart, ArrowRight } from '@phosphor-icons/react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { useFavorites } from '@/hooks/use-favorites'
 
 export function Dashboard() {
+  const { favorites } = useFavorites()
+  const recentFavorites = favorites.slice(0, 3)
+  
   const kpis = [
     { icon: Users, label: 'Active Users', value: '10,000+', color: 'text-primary' },
     { icon: TrendUp, label: 'Trips Planned', value: '25,000+', color: 'text-accent' },
@@ -183,6 +187,59 @@ export function Dashboard() {
       </section>
 
       <Separator className="my-8" />
+
+      {recentFavorites.length > 0 && (
+        <>
+          <section className="container mx-auto px-6 py-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-3xl font-bold flex items-center gap-3">
+                  <Heart size={32} weight="fill" className="text-red-500" />
+                  Favorite Destinations
+                </h2>
+                <p className="text-muted-foreground mt-1">Quick access to your saved destinations</p>
+              </div>
+              <Link to="/favorites">
+                <Button variant="outline" className="gap-2">
+                  View All
+                  <ArrowRight size={18} />
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentFavorites.map((destination) => (
+                <Link key={destination.id} to={`/explore/${encodeURIComponent(destination.name)}`}>
+                  <Card className="glass-surface hover:shadow-lg hover:scale-105 transition-all duration-200">
+                    <CardContent className="p-6 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <MapPin size={20} className="text-primary" weight="fill" />
+                            {destination.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-1">{destination.country}</p>
+                        </div>
+                        <Heart size={20} weight="fill" className="text-red-500 shrink-0" />
+                      </div>
+                      {destination.notes && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 bg-muted/30 rounded p-2">
+                          {destination.notes}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground pt-2 border-t">
+                        Saved {new Date(destination.savedAt).toLocaleDateString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <Separator className="my-8" />
+        </>
+      )}
 
       <section className="container mx-auto px-6 py-8 pb-16">
         <h2 className="text-3xl font-bold text-center mb-8">Core Features</h2>

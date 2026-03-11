@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Navigation } from './components/Navigation'
 import { Dashboard } from './pages/Dashboard'
 import { Explore } from './pages/Explore'
+import { Favorites } from './pages/Favorites'
 import { AIPlanner } from './pages/AIPlanner'
 import { Journal } from './pages/Journal'
 import { Trips } from './pages/Trips'
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:destinationName" element={<DestinationDetail />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/ai-planner" element={<AIPlanner />} />
             <Route path="/journal" element={<Journal />} />
