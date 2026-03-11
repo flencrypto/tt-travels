@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
-import { MapPin, ThermometerSimple, Warning } from '@phosphor-icons/react'
+import { MapPin, ThermometerSimple, Warning, NavigationArrow } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { ActivityRecommendations } from '@/components/ActivityRecommendations'
+import { WeatherSearch, type GeocodingResult } from '@/components/WeatherSearch'
 import { fetchWeather } from '@/lib/api'
 import type { Coordinates, WeatherData } from '@/lib/types'
+import { useKV } from '@github/spark/hooks'
+import type { Settings } from '@/lib/types'
 
 export function Explore() {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null)
@@ -12,9 +16,44 @@ export function Explore() {
   const [destination, setDestination] = useState<string>('your location')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isUsingCurrentLocation, setIsUsingCurrentLocation] = useState(true)
+  const [settings] = useKV<Settings>('tt-travels-settings', {
+    displayName: '',
+    temperatureUnit: 'celsius',
+  })
 
-  useEffect(() => {
+  const handleLocationSelect = (location: GeocodingResult, weatherData: { temperature: number; windSpeed: number; weatherCode: number; weatherCondition: string }) => {
+    const coords = {
+      lat: location.latitude,
+      lng: location.longitude,
+    }
+    setCoordinates(coords)
+    setIsUsingCurrentLocation(false)
+
+    const unit = settings?.temperatureUnit || 'celsius'
+    setWeather({
+      main: {
+        temp: weatherData.temperature,
+      },
+      unit: unit === 'celsius' ? '°C' : '°F',
+    })
+    setWeatherCondition(weatherData.weatherCondition)
+
+    const parts = [location.name]
+    if (location.admin1 && location.admin1 !== location.name) {
+      parts.push(location.admin1)
+    }
+    if (location.country) {
+      parts.push(location.country)
+    }
+    setDestination(parts.join(', '))
+    setError(null)
+  }
+
+  const loadCurrentLocation = () => {
     if ('geolocation' in navigator) {
+      setLoading(true)
+      setError(null)
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const coords = {
@@ -22,12 +61,10 @@ export function Explore() {
             lng: position.coords.longitude,
           }
           setCoordinates(coords)
+          setIsUsingCurrentLocation(true)
 
           try {
-            const settings = localStorage.getItem('tt-travels-settings')
-            const unit = settings
-              ? (JSON.parse(settings).temperatureUnit as 'celsius' | 'fahrenheit')
-              : 'celsius'
+            const unit = settings?.temperatureUnit || 'celsius'
 
             const weatherResponse = await fetch(
               `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current_weather=true&temperature_unit=${unit === 'celsius' ? 'celsius' : 'fahrenheit'}`
@@ -91,15 +128,40 @@ export function Explore() {
       setError('Geolocation is not supported by your browser')
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    loadCurrentLocation()
   }, [])
 
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">Explore Nearby</h1>
-        <p className="text-muted-foreground text-lg">
-          Discover locations and check weather around you
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Explore Weather & Activities</h1>
+            <p className="text-muted-foreground text-lg">
+              Search locations worldwide or use your current location
+            </p>
+          </div>
+          {!isUsingCurrentLocation && (
+            <Button
+              onClick={loadCurrentLocation}
+              variant="outline"
+              className="gap-2 shrink-0"
+            >
+              <NavigationArrow size={20} weight="fill" />
+              Use My Location
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        <WeatherSearch
+          onLocationSelect={handleLocationSelect}
+          temperatureUnit={settings?.temperatureUnit || 'celsius'}
+        />
       </div>
 
       {error && (
@@ -129,8 +191,11 @@ export function Explore() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <MapPin size={24} className="text-primary" weight="fill" />
-                  <CardTitle>Your Location</CardTitle>
+                  <CardTitle>{isUsingCurrentLocation ? 'Your Location' : 'Selected Location'}</CardTitle>
                 </div>
+                {!isUsingCurrentLocation && (
+                  <CardDescription>{destination}</CardDescription>
+                )}
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-sm text-muted-foreground">Latitude</p>
