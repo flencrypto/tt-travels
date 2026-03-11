@@ -57,9 +57,9 @@ export async function generateItinerary(options: ItineraryOptions): Promise<stri
     packed: 'an action-packed schedule maximizing experiences each day',
   }
 
-  const prompt = spark.llmPrompt`You are a helpful travel assistant. Create detailed, practical travel itineraries with day-by-day activities, local tips, and recommendations. Tailor your suggestions to the traveler's preferences, budget, and travel style.
+  const prompt = spark.llmPrompt`You are an expert travel planner with extensive knowledge of global destinations. Create comprehensive, highly detailed travel itineraries with complete day-by-day breakdowns, specific recommendations, insider tips, and practical advice. Provide extensive information to help travelers make the most of their trip.
 
-Create a detailed ${options.duration}-day travel itinerary for ${options.destination}.
+Create an extremely detailed and comprehensive ${options.duration}-day travel itinerary for ${options.destination}.
 
 Travel Preferences:
 - Travel Style: Focus on ${travelStyleDescriptions[options.travelStyle] || 'a balanced experience'}
@@ -67,14 +67,53 @@ Travel Preferences:
 - Group Type: Traveling as ${groupDescriptions[options.groupType] || 'solo'}
 - Pace: ${paceDescriptions[options.pace] || 'moderate'}
 
-Please structure the itinerary with:
-1. Day-by-day breakdown with morning, afternoon, and evening activities
-2. Specific attraction and restaurant recommendations
-3. Practical tips (transportation, booking advice, timing)
-4. Estimated costs where relevant
-5. Local insider tips and cultural notes
+IMPORTANT: Provide extensive, thorough details for each section. Be verbose and comprehensive.
 
-Make the itinerary detailed, actionable, and personalized to these preferences.`
+For EACH day, include ALL of the following sections:
+1. **Morning (3-4 detailed activities with timing)**
+   - Specific venues with addresses when possible
+   - Opening hours and best visiting times
+   - Expected duration for each activity
+   - Transportation between locations
+   - Breakfast/brunch recommendations with price ranges
+
+2. **Afternoon (3-4 detailed activities with timing)**
+   - Detailed attraction descriptions
+   - Ticket prices and booking links when relevant
+   - Lunch recommendations with menu highlights
+   - Walking routes or public transport options
+   - Photography tips and best viewpoints
+
+3. **Evening (2-3 detailed activities with timing)**
+   - Dinner recommendations with cuisine type and ambiance
+   - Evening activities or entertainment options
+   - Nightlife suggestions if appropriate
+   - Return transportation to accommodation
+
+4. **Daily Practical Information**
+   - Estimated total daily cost breakdown
+   - Recommended clothing/items to bring that day
+   - Weather considerations for that time
+   - Cultural etiquette tips
+   - Local phrases that might be useful
+   - Safety considerations
+
+5. **Insider Tips & Alternatives**
+   - Local secrets and hidden gems
+   - Alternative options if places are crowded
+   - Best times to avoid crowds
+   - Money-saving tips
+   - Where locals actually go
+
+Additionally, include:
+- **Pre-Trip Planning Section**: What to book in advance, visa requirements, best areas to stay, essential apps to download
+- **Getting Around**: Detailed transportation guide for the city/region
+- **Food Guide**: Must-try dishes, best restaurants by category, food markets
+- **Shopping Recommendations**: Best areas for shopping, what to buy, price expectations
+- **Day Trip Options**: Nearby destinations worth visiting if time permits
+- **Emergency Information**: Important phone numbers, hospital locations, embassy details
+
+Provide at least 2-3 paragraphs of detailed information for each major section. Include specific names, addresses, and pricing wherever possible. Make this itinerary comprehensive enough that a traveler could follow it without additional research.`
 
   try {
     const result = await spark.llm(prompt, 'gpt-4o')
