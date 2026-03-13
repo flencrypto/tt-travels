@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { generateDestinationGuide, type DestinationGuide } from '@/lib/destination-api'
 import { useFavorites } from '@/hooks/use-favorites'
+import { DistanceInfo } from '@/components/DistanceInfo'
 
 export function DestinationDetail() {
   const { destinationName } = useParams<{ destinationName: string }>()
@@ -148,6 +149,16 @@ export function DestinationDetail() {
                   </Badge>
                 ))}
               </div>
+              
+              {guide.coordinates && (
+                <div className="mt-8 pt-8 border-t border-border/50">
+                  <DistanceInfo
+                    destination={guide.coordinates}
+                    destinationName={guide.destination}
+                    compact={false}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

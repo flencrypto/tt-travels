@@ -52,6 +52,7 @@ export interface DestinationGuide {
   transportation: TransportationOption[]
   travelTips: TravelTip[]
   essentials: DestinationEssentials
+  coordinates?: { lat: number; lng: number }
 }
 
 export async function generateDestinationGuide(destination: string): Promise<DestinationGuide> {
@@ -132,6 +133,25 @@ Be specific, accurate, and practical. Include real place names, specific tips, a
   try {
     const result = await spark.llm(prompt, 'gpt-4o', true)
     const parsed = JSON.parse(result) as DestinationGuide
+    
+    try {
+      const geocodeResponse = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${parsed.destination}, ${parsed.country}`)}&format=json&limit=1`
+      )
+      
+      if (geocodeResponse.ok) {
+        const geocodeData = await geocodeResponse.json()
+        
+        if (geocodeData && geocodeData.length > 0) {
+          parsed.coordinates = {
+            lat: parseFloat(geocodeData[0].lat),
+            lng: parseFloat(geocodeData[0].lon)
+          }
+        }
+      }
+    } catch {
+    }
+    
     return parsed
   } catch (error) {
     throw new Error(`Failed to generate destination guide: ${error instanceof Error ? error.message : 'Unknown error'}`)

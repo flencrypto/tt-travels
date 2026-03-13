@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { generateSmartDestinationRecommendations, type DestinationRecommendation } from '@/lib/api'
+import { DistanceInfo } from './DistanceInfo'
 
 const INTEREST_OPTIONS = [
   'Adventure & Outdoor',
@@ -223,6 +224,15 @@ export function DestinationRecommendations() {
                     </Badge>
                   </div>
                   <p className="text-base mt-3">{rec.description}</p>
+                  {rec.coordinates && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <DistanceInfo
+                        destination={rec.coordinates}
+                        destinationName={rec.destination}
+                        compact={false}
+                      />
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="pt-6 space-y-5">
                   <div>

@@ -629,6 +629,7 @@ export interface DestinationRecommendation {
   estimatedBudget: string
   highlights: string[]
   travelTips: string[]
+  coordinates?: { lat: number; lng: number }
 }
 
 export async function generateSmartDestinationRecommendations(params: {
@@ -707,9 +708,47 @@ Ensure destinations are diverse geographically, culturally distinct, and genuine
       throw new Error('AI response format incorrect. Please try again.')
     }
 
-    return parsed.recommendations as DestinationRecommendation[]
+    const recommendations = parsed.recommendations as DestinationRecommendation[]
+    
+    const recommendationsWithCoords = await Promise.all(
+      recommendations.map(async (rec) => {
+        try {
+          const coords = await geocodeDestination(`${rec.destination}, ${rec.country}`)
+          return { ...rec, coordinates: coords }
+        } catch {
+          return rec
+        }
+      })
+    )
+
+    return recommendationsWithCoords
   } catch (error) {
     console.error('Destination recommendations error:', error)
     throw new Error(`Failed to generate destination recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+async function geocodeDestination(location: string): Promise<{ lat: number; lng: number } | undefined> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`
+    )
+    
+    if (!response.ok) {
+      return undefined
+    }
+
+    const data = await response.json()
+    
+    if (!data || data.length === 0) {
+      return undefined
+    }
+
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon)
+    }
+  } catch {
+    return undefined
   }
 }
