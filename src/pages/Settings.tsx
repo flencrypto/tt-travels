@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning, CloudCheck, Cloud } from '@phosphor-icons/react'
+import { useState, useRef } from 'react'
+import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning, CloudCheck, Cloud, DownloadSimple, UploadSimple } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,6 +51,7 @@ export function Settings() {
   }>({})
   const [isTestingAll, setIsTestingAll] = useState(false)
   const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSaveSettings = () => {
     toast.success('Settings saved successfully!')
@@ -279,6 +280,80 @@ export function Settings() {
     return <Badge variant="destructive">Failed</Badge>
   }
 
+  const exportAPIKeys = () => {
+    if (!apiKeys || Object.keys(apiKeys).length === 0) {
+      toast.error('No API keys to export')
+      return
+    }
+
+    const dataStr = JSON.stringify(apiKeys, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `tt-travels-api-keys-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    toast.success('API keys exported successfully!')
+  }
+
+  const importAPIKeys = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.name.endsWith('.json')) {
+      toast.error('Please select a valid JSON file')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string
+        const importedKeys = JSON.parse(content) as APIKeys
+        
+        const validKeys = [
+          'amadeus_api_key',
+          'amadeus_api_secret',
+          'openweather_api_key',
+          'airbnb_api_key',
+          'openai_api_key',
+          'mapbox_token',
+          'aviationstack_key',
+          'yelp_key',
+          'ticketmaster_key',
+          'google_maps_key'
+        ]
+        
+        const hasValidKeys = Object.keys(importedKeys).some(key => validKeys.includes(key))
+        
+        if (!hasValidKeys) {
+          toast.error('Invalid API keys file format')
+          return
+        }
+        
+        setApiKeys((current) => ({ ...current, ...importedKeys }))
+        setValidationResults({})
+        toast.success('API keys imported successfully!')
+      } catch (error) {
+        toast.error('Failed to parse JSON file')
+        console.error('Import error:', error)
+      }
+    }
+    reader.readAsText(file)
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const triggerImport = () => {
+    fileInputRef.current?.click()
+  }
+
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
       <div className="max-w-2xl mx-auto">
@@ -401,16 +476,45 @@ export function Settings() {
                 </CardDescription>
               </div>
             </div>
-            <Button
-              onClick={testAllAPIConnections}
-              disabled={isTestingAll || !apiKeys || Object.keys(apiKeys).length === 0}
-              variant="outline"
-              className="gap-2"
-            >
-              <Lightning size={20} weight="fill" />
-              Test All
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={exportAPIKeys}
+                disabled={!apiKeys || Object.keys(apiKeys).length === 0}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <DownloadSimple size={18} weight="bold" />
+                Export
+              </Button>
+              <Button
+                onClick={triggerImport}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <UploadSimple size={18} weight="bold" />
+                Import
+              </Button>
+              <Button
+                onClick={testAllAPIConnections}
+                disabled={isTestingAll || !apiKeys || Object.keys(apiKeys).length === 0}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <Lightning size={18} weight="fill" />
+                Test All
+              </Button>
+            </div>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={importAPIKeys}
+            className="hidden"
+          />
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -1023,6 +1127,17 @@ export function Settings() {
             <Check size={20} weight="bold" />
             Save API Keys
           </Button>
+
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4 space-y-2">
+            <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              Backup & Restore
+            </p>
+            <p className="text-xs text-blue-700 dark:text-blue-300">
+              Use the <strong>Export</strong> button to download your API keys as a JSON file for backup. 
+              Use <strong>Import</strong> to restore your keys from a previously exported file. 
+              This makes it easy to transfer your configuration between devices or recover from data loss.
+            </p>
+          </div>
 
           <div className="rounded-lg bg-muted p-4">
             <p className="text-xs text-muted-foreground">
