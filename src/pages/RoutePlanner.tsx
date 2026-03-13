@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { geocodeLocation, calculateDistance, formatDistance, formatDuration, getTransportMode } from '@/lib/geo'
 import { motion, AnimatePresence } from 'framer-motion'
+import { RouteMapView } from '@/components/RouteMapView'
 
 interface Destination {
   id: string
@@ -457,6 +458,12 @@ export function RoutePlanner() {
             )}
           </div>
         </div>
+
+        {routeSegments.length > 0 && (
+          <div className="mt-6">
+            <RouteMapView destinations={destinations} />
+          </div>
+        )}
       </div>
     </div>
   )
