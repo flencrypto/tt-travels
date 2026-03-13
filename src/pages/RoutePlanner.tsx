@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapTrifold, Plus, Trash, Clock, MapPin, Car, Airplane, X, ArrowsClockwise, NavigationArrow } from '@phosphor-icons/react'
+import { MapTrifold, Plus, Trash, Clock, MapPin, Car, Airplane, X, ArrowsClockwise, NavigationArrow, Sparkle } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,6 +38,7 @@ export function RoutePlanner() {
   const [loading, setLoading] = useState(false)
   const [unit, setUnit] = useState<'metric' | 'imperial'>('metric')
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number } | null>(null)
+  const [isOptimized, setIsOptimized] = useState(false)
 
   const addDestination = () => {
     const newId = (Math.max(...destinations.map(d => parseInt(d.id))) + 1).toString()
@@ -58,6 +59,7 @@ export function RoutePlanner() {
       d.id === id ? { ...d, name, geocoded: false, lat: undefined, lon: undefined } : d
     ))
     setRouteSegments([])
+    setIsOptimized(false)
   }
 
   const reorderDestinations = (fromIndex: number, direction: 'up' | 'down') => {
@@ -71,6 +73,7 @@ export function RoutePlanner() {
     
     setDestinations(newDestinations)
     setRouteSegments([])
+    setIsOptimized(false)
   }
 
   const useCurrentLocationAsStart = async () => {
@@ -193,6 +196,143 @@ export function RoutePlanner() {
     setTotalDistance(0)
     setTotalDuration(0)
     setCurrentLocation(null)
+    setIsOptimized(false)
+  }
+
+  const optimizeRoute = async () => {
+    if (destinations.length < 3) {
+      toast.error('Need at least 3 destinations to optimize')
+      return
+    }
+
+    const geocodedDests = destinations.filter(d => d.geocoded && d.lat !== undefined && d.lon !== undefined)
+    
+    if (geocodedDests.length < destinations.length) {
+      toast.error('Please calculate route first before optimizing')
+      return
+    }
+
+    setLoading(true)
+    
+    try {
+      const firstDest = geocodedDests[0]
+      const lastDest = geocodedDests[geocodedDests.length - 1]
+      const middleDests = geocodedDests.slice(1, -1)
+
+      if (middleDests.length === 0) {
+        toast.info('Route already optimal with only 2 destinations')
+        setLoading(false)
+        return
+      }
+
+      const optimizedMiddle = nearestNeighborOptimization(
+        firstDest,
+        middleDests,
+        lastDest
+      )
+
+      const optimizedRoute = [firstDest, ...optimizedMiddle, lastDest]
+      
+      setDestinations(optimizedRoute)
+
+      const segments: RouteSegment[] = []
+      let totalDist = 0
+      let totalTime = 0
+
+      for (let i = 0; i < optimizedRoute.length - 1; i++) {
+        const from = optimizedRoute[i]
+        const to = optimizedRoute[i + 1]
+
+        const distance = calculateDistance(
+          from.lat!,
+          from.lon!,
+          to.lat!,
+          to.lon!
+        )
+
+        const mode = getTransportMode(distance)
+        const duration = mode === 'driving' 
+          ? distance / 80
+          : distance / 800
+
+        segments.push({
+          from: from.name,
+          to: to.name,
+          distance,
+          duration,
+          mode
+        })
+
+        totalDist += distance
+        totalTime += duration
+      }
+
+      const savedDistance = totalDistance - totalDist
+      const savedTime = totalDuration - totalTime
+
+      setRouteSegments(segments)
+      setTotalDistance(totalDist)
+      setTotalDuration(totalTime)
+
+      if (savedDistance > 0) {
+        setIsOptimized(true)
+        toast.success(
+          `Route optimized! Saved ${formatDistance(savedDistance, unit)} and ${formatDuration(savedTime)}`,
+          { duration: 5000 }
+        )
+      } else {
+        setIsOptimized(true)
+        toast.success('Route is already optimal!')
+      }
+    } catch (error) {
+      console.error('Optimization error:', error)
+      toast.error('Failed to optimize route')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const nearestNeighborOptimization = (
+    start: Destination,
+    waypoints: Destination[],
+    end: Destination
+  ): Destination[] => {
+    if (waypoints.length === 0) return []
+    if (waypoints.length === 1) return waypoints
+
+    const unvisited = [...waypoints]
+    const optimized: Destination[] = []
+    let current = start
+
+    while (unvisited.length > 0) {
+      let nearestIndex = 0
+      let nearestDistance = calculateDistance(
+        current.lat!,
+        current.lon!,
+        unvisited[0].lat!,
+        unvisited[0].lon!
+      )
+
+      for (let i = 1; i < unvisited.length; i++) {
+        const distance = calculateDistance(
+          current.lat!,
+          current.lon!,
+          unvisited[i].lat!,
+          unvisited[i].lon!
+        )
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearestIndex = i
+        }
+      }
+
+      const nearest = unvisited.splice(nearestIndex, 1)[0]
+      optimized.push(nearest)
+      current = nearest
+    }
+
+    return optimized
   }
 
   return (
@@ -346,6 +486,23 @@ export function RoutePlanner() {
                   {loading ? 'Calculating...' : 'Calculate Route'}
                 </Button>
               </div>
+
+              {routeSegments.length > 0 && destinations.length > 2 && (
+                <div className="space-y-2">
+                  <Button
+                    onClick={optimizeRoute}
+                    disabled={loading}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    <Sparkle size={18} weight="duotone" />
+                    Optimize Route Order
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Reorder waypoints to minimize total travel distance and time
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -354,10 +511,18 @@ export function RoutePlanner() {
               <>
                 <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-2">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock size={20} />
-                      Route Summary
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Clock size={20} />
+                        Route Summary
+                      </CardTitle>
+                      {isOptimized && (
+                        <Badge className="bg-accent text-accent-foreground gap-1">
+                          <Sparkle size={14} weight="fill" />
+                          Optimized
+                        </Badge>
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
