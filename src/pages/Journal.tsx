@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 
 export function Journal() {
   const { entries, addEntry, deleteEntry, markAsShared } = useJournal()
+
   const [selectedMedia, setSelectedMedia] = useState<JournalMedia[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -20,21 +21,20 @@ export function Journal() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [selectedEntryForShare, setSelectedEntryForShare] = useState<JournalEntry | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // ==================== MEDIA HANDLING ====================
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
 
-    const newMedia: JournalMedia[] = Array.from(files).map((file) => {
-      const isVideo = file.type.startsWith('video/')
-      return {
-        id: `media-${Date.now()}-${Math.random()}`,
-        url: URL.createObjectURL(file),
-        type: isVideo ? 'video' : 'image',
-        file,
-      }
-    })
+    const newMedia: JournalMedia[] = Array.from(files).map((file) => ({
+      id: `media-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith('video/') ? 'video' : 'image',
+      file,
+    }))
 
     setSelectedMedia((prev) => [...prev, ...newMedia])
   }
@@ -42,13 +42,12 @@ export function Journal() {
   const removeMedia = (id: string) => {
     setSelectedMedia((prev) => {
       const media = prev.find((m) => m.id === id)
-      if (media) {
-        URL.revokeObjectURL(media.url)
-      }
+      if (media) URL.revokeObjectURL(media.url)
       return prev.filter((m) => m.id !== id)
     })
   }
 
+  // ==================== AI DESCRIPTION ====================
   const handleGenerateDescription = async () => {
     if (selectedMedia.length === 0) {
       toast.error('Please upload at least one photo or video')
@@ -62,28 +61,28 @@ export function Journal() {
         videos: selectedMedia.filter((m) => m.type === 'video').length,
       }
 
-      const generatedDescription = await generateMediaDescription(
+      const generated = await generateMediaDescription(
         selectedMedia.length,
         mediaTypes,
         location || undefined
       )
 
-      setDescription(generatedDescription)
+      setDescription(generated)
       toast.success('AI description generated!')
     } catch (error) {
       toast.error('Failed to generate description')
-      console.error('Description generation error:', error)
+      console.error(error)
     } finally {
       setIsGenerating(false)
     }
   }
 
+  // ==================== SAVE ENTRY ====================
   const handleSaveEntry = () => {
     if (!title.trim()) {
       toast.error('Please add a title')
       return
     }
-
     if (selectedMedia.length === 0) {
       toast.error('Please upload at least one photo or video')
       return
@@ -102,9 +101,7 @@ export function Journal() {
     setDescription('')
     setLocation('')
     setSelectedMedia([])
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
 
     toast.success('Journal entry saved!')
   }
@@ -137,7 +134,7 @@ export function Journal() {
         </p>
       </div>
 
-      {/* Create New Entry Card */}
+      {/* Create New Entry */}
       <Card className="max-w-5xl mx-auto glass-surface">
         <CardHeader>
           <CardTitle>Create New Entry</CardTitle>
@@ -146,7 +143,7 @@ export function Journal() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Title Input */}
+          {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input
@@ -157,7 +154,7 @@ export function Journal() {
             />
           </div>
 
-          {/* Location Input */}
+          {/* Location */}
           <div className="space-y-2">
             <Label htmlFor="location">Location (Optional)</Label>
             <Input
@@ -168,7 +165,7 @@ export function Journal() {
             />
           </div>
 
-          {/* File Upload */}
+          {/* Media Upload */}
           <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors">
             <input
               ref={fileInputRef}
@@ -181,10 +178,8 @@ export function Journal() {
             />
             <label htmlFor="media-upload">
               <Button asChild variant="outline" size="lg" className="gap-2 cursor-pointer">
-                <span>
-                  <Upload size={20} />
-                  Choose Photos & Videos
-                </span>
+                <Upload size={20} />
+                Choose Photos & Videos
               </Button>
             </label>
             <p className="text-sm text-muted-foreground mt-4">
@@ -192,7 +187,7 @@ export function Journal() {
             </p>
           </div>
 
-          {/* Selected Media Preview */}
+          {/* Media Preview */}
           {selectedMedia.length > 0 && (
             <div>
               <h3 className="font-semibold text-lg mb-4">
@@ -205,17 +200,10 @@ export function Journal() {
                     className="relative aspect-square rounded-lg overflow-hidden border shadow-sm hover:shadow-md transition-shadow group"
                   >
                     {media.type === 'image' ? (
-                      <img
-                        src={media.url}
-                        alt="Selected media"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={media.url} alt="Selected media" className="w-full h-full object-cover" />
                     ) : (
                       <div className="relative w-full h-full">
-                        <video
-                          src={media.url}
-                          className="w-full h-full object-cover"
-                        />
+                        <video src={media.url} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                           <Video size={48} className="text-white" weight="fill" />
                         </div>
@@ -224,7 +212,6 @@ export function Journal() {
                     <button
                       onClick={() => removeMedia(media.id)}
                       className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label="Remove media"
                     >
                       <X size={16} weight="bold" />
                     </button>
@@ -237,7 +224,7 @@ export function Journal() {
             </div>
           )}
 
-          {/* Description */}
+          {/* Description + AI Button */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="description">Description</Label>
@@ -254,7 +241,7 @@ export function Journal() {
             </div>
             <Textarea
               id="description"
-              placeholder="Describe your experience... or use AI to generate a description!"
+              placeholder="Describe your experience, key moments & how it felt... or let AI generate a polished description ✨"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
@@ -285,9 +272,7 @@ export function Journal() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle>{entry.title}</CardTitle>
-                      {entry.location && (
-                        <p className="text-sm text-muted-foreground mt-1">📍 {entry.location}</p>
-                      )}
+                      {entry.location && <p className="text-sm text-muted-foreground mt-1">📍 {entry.location}</p>}
                       <p className="text-xs text-muted-foreground mt-1">
                         {new Date(entry.createdAt).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -297,12 +282,7 @@ export function Journal() {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleShare(entry)}
-                        className="gap-2"
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleShare(entry)} className="gap-2">
                         <Share size={16} weight="fill" />
                         Share
                       </Button>
@@ -318,38 +298,18 @@ export function Journal() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Media Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {entry.media.map((media) => (
-                      <div
-                        key={media.id}
-                        className="relative aspect-square rounded-lg overflow-hidden border shadow-sm"
-                      >
+                      <div key={media.id} className="relative aspect-square rounded-lg overflow-hidden border shadow-sm">
                         {media.type === 'image' ? (
-                          <img
-                            src={media.url}
-                            alt="Journal media"
-                            className="w-full h-full object-cover"
-                          />
+                          <img src={media.url} alt="Journal media" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="relative w-full h-full">
-                            <video
-                              src={media.url}
-                              className="w-full h-full object-cover"
-                              controls
-                            />
-                          </div>
+                          <video src={media.url} controls className="w-full h-full object-cover" />
                         )}
                       </div>
                     ))}
                   </div>
-
-                  {/* Description */}
-                  {entry.description && (
-                    <p className="text-sm whitespace-pre-wrap">{entry.description}</p>
-                  )}
-
-                  {/* Shared Badges */}
+                  {entry.description && <p className="text-sm whitespace-pre-wrap">{entry.description}</p>}
                   {entry.sharedOn && entry.sharedOn.length > 0 && (
                     <div className="flex gap-2 flex-wrap">
                       {entry.sharedOn.map((platform) => (
