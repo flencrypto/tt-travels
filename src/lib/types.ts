@@ -31,6 +31,11 @@ export interface APIKeys {
   openweather_api_key?: string
   airbnb_api_key?: string
   openai_api_key?: string
+  mapbox_token?: string
+  aviationstack_key?: string
+  yelp_key?: string
+  ticketmaster_key?: string
+  google_maps_key?: string
 }
 
 export interface APIValidationResult {

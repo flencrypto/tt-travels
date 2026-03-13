@@ -20,6 +20,11 @@ import {
   validateOpenWeatherKey, 
   validateAirbnbKey,
   validateOpenAIKey,
+  validateMapboxToken,
+  validateAviationStackKey,
+  validateYelpKey,
+  validateTicketmasterKey,
+  validateGoogleMapsKey,
   testAllConnections 
 } from '@/lib/api-validation'
 
@@ -38,6 +43,11 @@ export function Settings() {
     openweather?: APIValidationResult
     airbnb?: APIValidationResult
     openai?: APIValidationResult
+    mapbox?: APIValidationResult
+    aviationstack?: APIValidationResult
+    yelp?: APIValidationResult
+    ticketmaster?: APIValidationResult
+    googlemaps?: APIValidationResult
   }>({})
   const [isTestingAll, setIsTestingAll] = useState(false)
   const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
@@ -125,6 +135,96 @@ export function Settings() {
     }
   }
 
+  const testMapboxConnection = async () => {
+    if (!apiKeys?.mapbox_token) {
+      toast.error('Please enter Mapbox token')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, mapbox: true }))
+    const result = await validateMapboxToken(apiKeys.mapbox_token)
+    setValidationResults((prev) => ({ ...prev, mapbox: result }))
+    setIsTesting((prev) => ({ ...prev, mapbox: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testAviationStackConnection = async () => {
+    if (!apiKeys?.aviationstack_key) {
+      toast.error('Please enter AviationStack API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, aviationstack: true }))
+    const result = await validateAviationStackKey(apiKeys.aviationstack_key)
+    setValidationResults((prev) => ({ ...prev, aviationstack: result }))
+    setIsTesting((prev) => ({ ...prev, aviationstack: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testYelpConnection = async () => {
+    if (!apiKeys?.yelp_key) {
+      toast.error('Please enter Yelp API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, yelp: true }))
+    const result = await validateYelpKey(apiKeys.yelp_key)
+    setValidationResults((prev) => ({ ...prev, yelp: result }))
+    setIsTesting((prev) => ({ ...prev, yelp: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testTicketmasterConnection = async () => {
+    if (!apiKeys?.ticketmaster_key) {
+      toast.error('Please enter Ticketmaster API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, ticketmaster: true }))
+    const result = await validateTicketmasterKey(apiKeys.ticketmaster_key)
+    setValidationResults((prev) => ({ ...prev, ticketmaster: result }))
+    setIsTesting((prev) => ({ ...prev, ticketmaster: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  const testGoogleMapsConnection = async () => {
+    if (!apiKeys?.google_maps_key) {
+      toast.error('Please enter Google Maps API key')
+      return
+    }
+
+    setIsTesting((prev) => ({ ...prev, googlemaps: true }))
+    const result = await validateGoogleMapsKey(apiKeys.google_maps_key)
+    setValidationResults((prev) => ({ ...prev, googlemaps: result }))
+    setIsTesting((prev) => ({ ...prev, googlemaps: false }))
+
+    if (result.isValid) {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
   const testAllAPIConnections = async () => {
     if (!apiKeys || Object.keys(apiKeys).length === 0) {
       toast.error('Please enter at least one API key')
@@ -141,6 +241,11 @@ export function Settings() {
       ...(results.openweather && { openweather: results.openweather }),
       ...(results.airbnb && { airbnb: results.airbnb }),
       ...(results.openai && { openai: results.openai }),
+      ...(results.mapbox && { mapbox: results.mapbox }),
+      ...(results.aviationstack && { aviationstack: results.aviationstack }),
+      ...(results.yelp && { yelp: results.yelp }),
+      ...(results.ticketmaster && { ticketmaster: results.ticketmaster }),
+      ...(results.googlemaps && { googlemaps: results.googlemaps }),
     }
     
     setValidationResults(filteredResults)
@@ -587,6 +692,326 @@ export function Settings() {
             )}
             <p className="text-xs text-muted-foreground">
               Optional: for Airbnb accommodation search
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="mapbox-token">Mapbox Access Token</Label>
+              {getValidationBadge(validationResults.mapbox)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="mapbox-token"
+                type={showKeys['mapbox_token'] ? 'text' : 'password'}
+                placeholder="Enter your Mapbox access token"
+                value={apiKeys?.mapbox_token || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, mapbox_token: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('mapbox_token')}
+              >
+                {showKeys['mapbox_token'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testMapboxConnection}
+                disabled={isTesting.mapbox || !apiKeys?.mapbox_token}
+                className="gap-2"
+              >
+                {isTesting.mapbox ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.mapbox && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.mapbox.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.mapbox)}
+                <div>
+                  <p className="font-medium">{validationResults.mapbox.message}</p>
+                  {validationResults.mapbox.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.mapbox.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Optional: for enhanced mapping features and geocoding
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="aviationstack-key">AviationStack API Key</Label>
+              {getValidationBadge(validationResults.aviationstack)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="aviationstack-key"
+                type={showKeys['aviationstack_key'] ? 'text' : 'password'}
+                placeholder="Enter your AviationStack API key"
+                value={apiKeys?.aviationstack_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, aviationstack_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('aviationstack_key')}
+              >
+                {showKeys['aviationstack_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testAviationStackConnection}
+                disabled={isTesting.aviationstack || !apiKeys?.aviationstack_key}
+                className="gap-2"
+              >
+                {isTesting.aviationstack ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.aviationstack && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.aviationstack.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.aviationstack)}
+                <div>
+                  <p className="font-medium">{validationResults.aviationstack.message}</p>
+                  {validationResults.aviationstack.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.aviationstack.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Optional: for real-time flight tracking and airline information
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="yelp-key">Yelp API Key</Label>
+              {getValidationBadge(validationResults.yelp)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="yelp-key"
+                type={showKeys['yelp_key'] ? 'text' : 'password'}
+                placeholder="Enter your Yelp API key"
+                value={apiKeys?.yelp_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, yelp_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('yelp_key')}
+              >
+                {showKeys['yelp_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testYelpConnection}
+                disabled={isTesting.yelp || !apiKeys?.yelp_key}
+                className="gap-2"
+              >
+                {isTesting.yelp ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.yelp && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.yelp.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.yelp)}
+                <div>
+                  <p className="font-medium">{validationResults.yelp.message}</p>
+                  {validationResults.yelp.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.yelp.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Optional: for local business recommendations and reviews
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="ticketmaster-key">Ticketmaster API Key</Label>
+              {getValidationBadge(validationResults.ticketmaster)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="ticketmaster-key"
+                type={showKeys['ticketmaster_key'] ? 'text' : 'password'}
+                placeholder="Enter your Ticketmaster API key"
+                value={apiKeys?.ticketmaster_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, ticketmaster_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('ticketmaster_key')}
+              >
+                {showKeys['ticketmaster_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testTicketmasterConnection}
+                disabled={isTesting.ticketmaster || !apiKeys?.ticketmaster_key}
+                className="gap-2"
+              >
+                {isTesting.ticketmaster ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.ticketmaster && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.ticketmaster.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.ticketmaster)}
+                <div>
+                  <p className="font-medium">{validationResults.ticketmaster.message}</p>
+                  {validationResults.ticketmaster.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.ticketmaster.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Optional: for events, concerts, and entertainment recommendations
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="google-maps-key">Google Maps API Key</Label>
+              {getValidationBadge(validationResults.googlemaps)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="google-maps-key"
+                type={showKeys['google_maps_key'] ? 'text' : 'password'}
+                placeholder="Enter your Google Maps API key"
+                value={apiKeys?.google_maps_key || ''}
+                onChange={(e) =>
+                  setApiKeys((current) => ({ ...current, google_maps_key: e.target.value }))
+                }
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleKeyVisibility('google_maps_key')}
+              >
+                {showKeys['google_maps_key'] ? (
+                  <EyeSlash size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={testGoogleMapsConnection}
+                disabled={isTesting.googlemaps || !apiKeys?.google_maps_key}
+                className="gap-2"
+              >
+                {isTesting.googlemaps ? (
+                  <>Testing...</>
+                ) : (
+                  <>
+                    <Lightning size={18} weight="fill" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+            {validationResults.googlemaps && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.googlemaps.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.googlemaps)}
+                <div>
+                  <p className="font-medium">{validationResults.googlemaps.message}</p>
+                  {validationResults.googlemaps.details && (
+                    <p className="text-xs opacity-80 mt-1">{validationResults.googlemaps.details}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Optional: for enhanced maps, geocoding, and places API
             </p>
           </div>
 
