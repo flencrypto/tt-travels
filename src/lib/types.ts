@@ -138,3 +138,25 @@ export interface HotelSearchParams {
   radius?: number
   radiusUnit?: 'KM' | 'MILE'
 }
+
+export interface JournalMedia {
+  id: string
+  url: string
+  type: 'image' | 'video'
+  thumbnail?: string
+  file?: File
+}
+
+export interface JournalEntry {
+  id: string
+  title: string
+  description: string
+  location?: string
+  media: JournalMedia[]
+  createdAt: string
+  updatedAt: string
+  tags?: string[]
+  sharedOn?: ('instagram' | 'facebook' | 'tiktok')[]
+}
+
+export type SocialPlatform = 'instagram' | 'facebook' | 'tiktok'
