@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkle, Warning, Backpack, Compass, MapTrifold, ClockCounterClockwise, Trash } from '@phosphor-icons/react'
+import { Sparkle, Warning, Backpack, Compass, MapTrifold, ClockCounterClockwise, Trash, MapPin, NavigationArrow } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { SetupModal } from '@/components/SetupModal'
 import { PackingList } from '@/components/PackingList'
 import { DestinationRecommendations } from '@/components/DestinationRecommendations'
 import { ItineraryMapView } from '@/components/ItineraryMapView'
+import { GeoLocalRecommendations } from '@/components/GeoLocalRecommendations'
 import { generateItinerary, generatePackingList, MissingApiKeyError, type ItineraryOptions, type PackingListOptions, type PackingListItem } from '@/lib/api'
 import { toast } from 'sonner'
 import { useItinerarySearchHistory } from '@/hooks/use-search-history'
@@ -28,6 +29,8 @@ export function AIPlanner() {
   const [error, setError] = useState<string | null>(null)
   const [showSetupModal, setShowSetupModal] = useState(false)
   const { history, addSearch, clearHistory } = useItinerarySearchHistory()
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number; name: string } | null>(null)
+  const [locationLoading, setLocationLoading] = useState(false)
 
   const handleGenerate = async () => {
     if (!destination.trim()) {
@@ -119,6 +122,70 @@ export function AIPlanner() {
     }
   }
 
+  const getLocationName = async (lat: number, lon: number): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1`
+      )
+      if (!response.ok) throw new Error('Failed to reverse geocode')
+      
+      const data = await response.json()
+      if (data.results && data.results.length > 0) {
+        const location = data.results[0]
+        return location.name + (location.country ? `, ${location.country}` : '')
+      }
+      return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+    } catch (error) {
+      return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+    }
+  }
+
+  const handleUseMyLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser')
+      return
+    }
+
+    setLocationLoading(true)
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude
+        const lon = position.coords.longitude
+        
+        const locationName = await getLocationName(lat, lon)
+        
+        setCurrentLocation({ lat, lon, name: locationName })
+        setDestination(locationName)
+        setLocationLoading(false)
+        toast.success(`Location detected: ${locationName}`)
+      },
+      (error) => {
+        setLocationLoading(false)
+        let errorMessage = 'Unable to retrieve your location'
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out'
+            break
+        }
+        
+        toast.error(errorMessage)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    )
+  }
+
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
       <div className="max-w-4xl mx-auto">
@@ -132,7 +199,7 @@ export function AIPlanner() {
       </div>
 
       <Tabs defaultValue="itinerary" className="max-w-4xl mx-auto">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="itinerary" className="gap-2">
             <Sparkle size={18} weight="fill" />
             Create Itinerary
@@ -140,6 +207,10 @@ export function AIPlanner() {
           <TabsTrigger value="discover" className="gap-2">
             <Compass size={18} weight="fill" />
             Discover Destinations
+          </TabsTrigger>
+          <TabsTrigger value="local" className="gap-2">
+            <NavigationArrow size={18} weight="fill" />
+            Local Recommendations
           </TabsTrigger>
         </TabsList>
 
@@ -154,14 +225,46 @@ export function AIPlanner() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="destination">Destination</Label>
-                <Input
-                  id="destination"
-                  placeholder="e.g., Paris, Tokyo, New York"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={loading}
-                />
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <Input
+                      id="destination"
+                      placeholder="e.g., Paris, Tokyo, New York"
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      disabled={loading}
+                      className="pr-10"
+                    />
+                    {currentLocation && (
+                      <MapPin 
+                        size={20} 
+                        weight="fill" 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-accent"
+                      />
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleUseMyLocation}
+                    disabled={locationLoading || loading}
+                    className="shrink-0"
+                    title="Use my current location"
+                  >
+                    {locationLoading ? (
+                      <NavigationArrow size={20} className="animate-spin" />
+                    ) : (
+                      <NavigationArrow size={20} weight="fill" />
+                    )}
+                  </Button>
+                </div>
+                {currentLocation && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin size={14} weight="fill" />
+                    Planning from: {currentLocation.name}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -385,6 +488,10 @@ export function AIPlanner() {
 
         <TabsContent value="discover">
           <DestinationRecommendations />
+        </TabsContent>
+
+        <TabsContent value="local">
+          <GeoLocalRecommendations currentLocation={currentLocation} onLocationDetected={handleUseMyLocation} />
         </TabsContent>
       </Tabs>
 

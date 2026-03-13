@@ -9,28 +9,46 @@ import { generateGeoLocalRecommendations, type GeoRecommendation } from '@/lib/g
 import { cn } from '@/lib/utils'
 
 interface GeoLocalRecommendationsProps {
-  latitude: number
-  longitude: number
-  locationName: string
+  latitude?: number
+  longitude?: number
+  locationName?: string
+  currentLocation?: { lat: number; lon: number; name: string } | null
+  onLocationDetected?: () => void
 }
 
-export function GeoLocalRecommendations({ latitude, longitude, locationName }: GeoLocalRecommendationsProps) {
+export function GeoLocalRecommendations({ 
+  latitude, 
+  longitude, 
+  locationName,
+  currentLocation,
+  onLocationDetected
+}: GeoLocalRecommendationsProps) {
   const [recommendations, setRecommendations] = useState<GeoRecommendation[]>([])
   const [offTheBeaten, setOffTheBeaten] = useState<GeoRecommendation[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'things-to-do' | 'places-to-eat'>('things-to-do')
 
+  const effectiveLatitude = latitude ?? currentLocation?.lat
+  const effectiveLongitude = longitude ?? currentLocation?.lon
+  const effectiveLocationName = locationName ?? currentLocation?.name ?? ''
+
   useEffect(() => {
-    loadRecommendations()
-  }, [latitude, longitude, activeTab])
+    if (effectiveLatitude !== undefined && effectiveLongitude !== undefined) {
+      loadRecommendations()
+    }
+  }, [effectiveLatitude, effectiveLongitude, activeTab])
 
   const loadRecommendations = async () => {
+    if (effectiveLatitude === undefined || effectiveLongitude === undefined) {
+      return
+    }
+    
     setLoading(true)
     try {
       const data = await generateGeoLocalRecommendations(
-        latitude,
-        longitude,
-        locationName,
+        effectiveLatitude,
+        effectiveLongitude,
+        effectiveLocationName,
         activeTab
       )
       setRecommendations(data.mainstream)
@@ -63,8 +81,32 @@ export function GeoLocalRecommendations({ latitude, longitude, locationName }: G
   }
 
   const openInMaps = (name: string) => {
-    const query = encodeURIComponent(`${name} near ${locationName}`)
+    const query = encodeURIComponent(`${name} near ${effectiveLocationName}`)
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
+  }
+
+  if (!effectiveLatitude || !effectiveLongitude) {
+    return (
+      <Card className="glass-surface">
+        <CardContent className="p-12 text-center space-y-6">
+          <div className="flex justify-center">
+            <NavigationArrow size={64} className="text-primary" weight="fill" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Enable Location to Get Local Recommendations</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Share your location to discover amazing places to visit and eat nearby, including hidden gems that locals love.
+            </p>
+          </div>
+          {onLocationDetected && (
+            <Button size="lg" onClick={onLocationDetected} className="gap-2">
+              <MapPin size={20} weight="fill" />
+              Detect My Location
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    )
   }
 
   if (loading) {
