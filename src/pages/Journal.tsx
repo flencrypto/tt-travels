@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Camera, Upload, VideoCamera, InstagramLogo, FacebookLogo, TiktokLogo, Sparkle } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -61,6 +61,9 @@ export function Journal() {
     }))
 
     setMedia((prev) => [...prev, ...newMedia])
+
+    // Clear the file input so selecting the same file(s) again will still trigger onChange
+    e.target.value = ''
   }
 
   const togglePlatform = (platform: Platform) => {
@@ -147,11 +150,17 @@ Keep tone: warm, curious, adventurous. Avoid repeating filenames verbatim.`
     }
   }
 
+  const latestMediaRef = useRef<MediaItem[]>(media)
+
+  useEffect(() => {
+    latestMediaRef.current = media
+  }, [media])
+
   useEffect(() => {
     return () => {
-      media.forEach((item) => URL.revokeObjectURL(item.url))
+      latestMediaRef.current.forEach((item) => URL.revokeObjectURL(item.url))
     }
-  }, [media])
+  }, [])
 
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
@@ -208,7 +217,7 @@ Keep tone: warm, curious, adventurous. Avoid repeating filenames verbatim.`
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    AI uses filenames and media type to craft the story—no content is sent.
+                    AI uses filenames, counts, types, and sizes of your media (not the photo or video content itself) to craft the story. This metadata may be sent to our AI partner, but your actual media files stay on this device.
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
