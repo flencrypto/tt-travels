@@ -12,6 +12,7 @@ import { Settings } from './pages/Settings'
 import { Setup } from './pages/Setup'
 import { Bookings } from './pages/Bookings'
 import { DestinationDetail } from './pages/DestinationDetail'
+import { RoutePlanner } from './pages/RoutePlanner'
 import { Toaster } from './components/ui/sonner'
 import { useClerkSync } from './hooks/use-clerk-sync'
 import { useTheme } from './hooks/use-theme'
@@ -40,6 +41,7 @@ function AppContent() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/ai-planner" element={<AIPlanner />} />
+            <Route path="/route-planner" element={<RoutePlanner />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/trips" element={<Trips />} />
             <Route path="/settings" element={<Settings />} />

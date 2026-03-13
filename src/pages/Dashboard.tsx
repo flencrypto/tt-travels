@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe, Ticket, Heart, ArrowRight } from '@phosphor-icons/react'
+import { Sparkle, MapPin, CalendarDots, Users, TrendUp, Globe, Ticket, Heart, ArrowRight, MapTrifold } from '@phosphor-icons/react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -52,6 +52,12 @@ export function Dashboard() {
       title: 'AI Trip Planner',
       description: 'Let AI create detailed itineraries tailored to your preferences',
       to: '/ai-planner',
+    },
+    {
+      icon: MapTrifold,
+      title: 'Route Planner',
+      description: 'Plan multi-destination routes with total distance and travel time',
+      to: '/route-planner',
     },
     {
       icon: MapPin,
