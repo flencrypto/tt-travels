@@ -1,67 +1,75 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { Show } from '@clerk/react'
-import { Navigation } from './components/Navigation'
-import { Landing } from './pages/Landing'
-import { Dashboard } from './pages/Dashboard'
-import { Explore } from './pages/Explore'
-import { Favorites } from './pages/Favorites'
-import { AIPlanner } from './pages/AIPlanner'
-import { Journal } from './pages/Journal'
-import { Trips } from './pages/Trips'
-import { Settings } from './pages/Settings'
-import { Setup } from './pages/Setup'
-import { Bookings } from './pages/Bookings'
-import { DestinationDetail } from './pages/DestinationDetail'
-import { RoutePlanner } from './pages/RoutePlanner'
+import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
+import { Header } from './components/Header'
+import { DestinationGrid } from './components/DestinationGrid'
+import { Favorites } from './components/Favorites'
 import { Toaster } from './components/ui/sonner'
-import { useClerkSync } from './hooks/use-clerk-sync'
-import { useTheme } from './hooks/use-theme'
 
-function AppContent() {
-  const location = useLocation()
-  const isLandingPage = location.pathname === '/' || location.pathname === '/landing'
-  
-  return (
-    <>
-      <a href="#main-content" className="skip-link">Skip to content</a>
-      <div className="min-h-screen bg-background">
-        <Show when="signed-in">
-          <Navigation />
-        </Show>
-        <Show when="signed-out">
-          {!isLandingPage && <Navigation />}
-        </Show>
-        <main id="main-content">
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/explore/:destinationName" element={<DestinationDetail />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/bookings" element={<Bookings />} />
-            <Route path="/ai-planner" element={<AIPlanner />} />
-            <Route path="/route-planner" element={<RoutePlanner />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/trips" element={<Trips />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/setup" element={<Setup />} />
-          </Routes>
-        </main>
-      </div>
-      <Toaster />
-    </>
-  );
+export type Destination = {
+  id: string
+  name: string
+  country: string
+  description: string
+  highlights: string[]
+  image: string
+  category: string
+}
+
+export type FavoriteDestination = Destination & {
+  savedAt: string
+  notes?: string
 }
 
 function App() {
-  useClerkSync()
-  useTheme()
-  
+  const [activeTab, setActiveTab] = useState<'explore' | 'favorites'>('explore')
+  const [favorites, setFavorites] = useKV<FavoriteDestination[]>('favorites', [])
+
+  const toggleFavorite = (destination: Destination) => {
+    setFavorites((currentFavorites) => {
+      if (!currentFavorites) return [{ ...destination, savedAt: new Date().toISOString() }]
+      const exists = currentFavorites.find(f => f.id === destination.id)
+      if (exists) {
+        return currentFavorites.filter(f => f.id !== destination.id)
+      } else {
+        return [...currentFavorites, { ...destination, savedAt: new Date().toISOString() }]
+      }
+    })
+  }
+
+  const isFavorite = (destinationId: string) => {
+    return favorites?.some(f => f.id === destinationId) ?? false
+  }
+
+  const updateNote = (destinationId: string, notes: string) => {
+    setFavorites((currentFavorites) => {
+      if (!currentFavorites) return []
+      return currentFavorites.map(f => 
+        f.id === destinationId ? { ...f, notes } : f
+      )
+    })
+  }
+
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <div className="min-h-screen bg-background">
+      <Header activeTab={activeTab} onTabChange={setActiveTab} favoriteCount={favorites?.length ?? 0} />
+      
+      <main className="container mx-auto px-4 md:px-12 py-12">
+        {activeTab === 'explore' ? (
+          <DestinationGrid 
+            onToggleFavorite={toggleFavorite}
+            isFavorite={isFavorite}
+          />
+        ) : (
+          <Favorites 
+            favorites={favorites || []}
+            onToggleFavorite={toggleFavorite}
+            onUpdateNote={updateNote}
+          />
+        )}
+      </main>
+
+      <Toaster />
+    </div>
   )
 }
 
