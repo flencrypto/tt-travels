@@ -1187,33 +1187,33 @@ export function Settings() {
                   </Button>
                   <Button
                     variant="secondary"
-          {isOwner && (apsConnection}
-            <> !apiKeys?.google_maps_key}
-              <Button
-                onClick={handleSaveAPIKeys}
-                className="w-full gap-2"
-                size="lg"
-              >
-                <Check size={20} weight="bold" />
-                Save API Keystning size={18} weight="fill" />
-              </Button>
-
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4 space-y-2">
-                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  Backup & Restore
-                </p>
-                <p className="text-xs text-blue-700 dark:text-blue-300">
-                  Use the <strong>Export</strong> button to download your API keys as a JSON file for backup. 
-                  Use <strong>Import</strong> to restore your keys from a previously exported file. 
-                  This makes it easy to transfer your configuration between devices or recover from data loss.
-                </p>'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
-              </div>
-            </>
-          )}
-
+                    onClick={testGoogleMapsConnection}
+                    disabled={isTesting.googlemaps || !apiKeys?.google_maps_key}
+                    className="gap-2"
+                  >
+                    {isTesting.googlemaps ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+            </div>
+            {validationResults.googlemaps && (
+              <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
+                validationResults.googlemaps.isValid 
+                  ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100' 
+                  : 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100'
+              }`}>
+                {getValidationIcon(validationResults.googlemaps)}
+                <div>
                   <p className="font-medium">{validationResults.googlemaps.message}</p>
                   {validationResults.googlemaps.details && (
-              <strong>Privacy Note:</strong> {isOwner ? 'All API keys are stored locally in your browser and never sent to any server except the respective service providers when making API calls.' : 'API keys are configured by the app owner and stored securely. You have full access to all features without needing to set up your own keys.'}
+                    <p className="text-xs opacity-80 mt-1">{validationResults.googlemaps.details}</p>
                   )}
                 </div>
               </div>
