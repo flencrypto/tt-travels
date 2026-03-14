@@ -97,22 +97,22 @@ This is a full-featured travel platform with authentication, multiple specialize
 
 ## Design Direction
 
-The design should feel clean, minimal, and refined - like a premium design studio. Pure white aesthetics with subtle grays and careful use of shadows create a sophisticated, distraction-free atmosphere that puts content first and makes travel planning feel elegant and focused.
+The design should feel vibrant, adventurous, and inspiring - like a premium travel magazine brought to life. Rich purples and blues with warm accent colors create an energetic, exploration-focused atmosphere that makes travel planning feel exciting and aspirational.
 
 ## Color Selection
 
-A clean, minimal white palette with subtle grays for a pure and sophisticated aesthetic:
+A vibrant travel-inspired palette with rich purples, teals, and warm accents:
 
-- **Primary Color**: Pure White `oklch(0.98 0 0)` - Clean, minimal brand color conveying simplicity and clarity
+- **Primary Color**: Rich Purple `oklch(0.55 0.22 262)` - Bold, adventurous brand color conveying exploration and premium quality
 - **Secondary Colors**: 
-  - Light Gray `oklch(0.96 0 0)` - Subtle backgrounds and dividers
-  - Medium Gray `oklch(0.90 0 0)` - Borders and inactive elements
-- **Accent Color**: Off-White `oklch(0.98 0 0)` - Subtle highlights maintaining the white aesthetic
+  - Teal Blue `oklch(0.70 0.19 195)` - Refreshing color evoking oceans and skies
+  - Warm Orange `oklch(0.75 0.20 40)` - Energetic accent for CTAs and highlights
+- **Accent Color**: Warm Orange `oklch(0.75 0.20 40)` - Attention-grabbing highlight for important elements
 - **Foreground/Background Pairings**:
-  - Background (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
-  - Primary (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
-  - Card (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
-  - Borders (Light Gray): All text passes WCAG AA ✓
+  - Background (Soft White `oklch(0.99 0.005 106)`): Dark Purple text `oklch(0.20 0.015 260)` - Ratio 13.8:1 ✓
+  - Primary (Rich Purple): White text - Ratio 5.2:1 ✓
+  - Secondary (Teal Blue): White text - Ratio 4.7:1 ✓
+  - Accent (Warm Orange): Dark text - Ratio 6.1:1 ✓
 
 ## Font Selection
 
