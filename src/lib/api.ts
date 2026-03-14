@@ -17,14 +17,7 @@ export interface ItineraryOptions {
   pace: string
 }
 
-async function getStoredAPIKeys() {
-  try {
-    const keys = await spark.kv.get<{ openai_api_key?: string }>('tt-travels-api-keys')
-    return keys
-  } catch {
-    return null
-  }
-}
+
 
 export async function generateItinerary(options: ItineraryOptions): Promise<string> {
   const travelStyleDescriptions: Record<string, string> = {
@@ -215,23 +208,6 @@ export async function fetchWeather(
 
 export const INTEGRATIONS: Integration[] = [
   {
-    id: 'openai',
-    name: 'OpenAI',
-    description: 'AI-powered travel itinerary generation using GPT models',
-    envVars: ['VITE_OPENAI_API_KEY', 'VITE_OPENAI_MODEL (optional)'],
-    setupSteps: [
-      'Sign up at https://platform.openai.com',
-      'Generate an API key from your account dashboard',
-      'Create a .env file in your project root',
-      'Add: VITE_OPENAI_API_KEY=your_api_key_here',
-      'Optionally add: VITE_OPENAI_MODEL=gpt-4 (defaults to gpt-3.5-turbo)',
-      'Restart your development server',
-    ],
-    officialLink: 'https://platform.openai.com',
-    affectedActions: ['AI Trip Planner - Generate itineraries'],
-    notes: 'API usage will incur charges based on OpenAI pricing',
-  },
-  {
     id: 'amadeus',
     name: 'Amadeus for Developers',
     description: 'Real-time flight and hotel booking search powered by Amadeus Travel APIs',
@@ -240,14 +216,13 @@ export const INTEGRATIONS: Integration[] = [
       'Sign up at https://developers.amadeus.com',
       'Create a new app in your dashboard to get API credentials',
       'Copy your API Key and API Secret',
-      'Add to your .env file: VITE_AMADEUS_API_KEY=your_api_key',
-      'Add to your .env file: VITE_AMADEUS_API_SECRET=your_api_secret',
+      'Add to Settings page or your .env file: VITE_AMADEUS_API_KEY=your_api_key',
+      'Add to Settings page or your .env file: VITE_AMADEUS_API_SECRET=your_api_secret',
       'Start with test environment (free tier with test data)',
-      'Restart your development server',
     ],
     officialLink: 'https://developers.amadeus.com',
     affectedActions: ['Bookings - Search flights', 'Bookings - Search hotels'],
-    notes: 'Free test environment available with realistic test data',
+    notes: 'Free test environment available with realistic test data. Configure in Settings page for best experience.',
   },
   {
     id: 'geolocation',
@@ -564,10 +539,6 @@ export function isIntegrationConfigured(integration: Integration): boolean {
     return 'geolocation' in navigator
   }
 
-  if (integration.id === 'openai') {
-    return Boolean(import.meta.env.VITE_OPENAI_API_KEY)
-  }
-
   if (integration.id === 'amadeus') {
     return Boolean(import.meta.env.VITE_AMADEUS_API_KEY && import.meta.env.VITE_AMADEUS_API_SECRET)
   }
@@ -621,17 +592,10 @@ Return ONLY a JSON object in this exact format:
 Be specific to ${destination} - mention actual landmarks, neighborhoods, and local favorites. Consider the weather when rating suitability.`
 
   try {
-    const apiKeys = await getStoredAPIKeys()
-    const envKey = import.meta.env.VITE_OPENAI_API_KEY
-    
-    if (!apiKeys?.openai_api_key && !envKey) {
-      throw new Error('OpenAI API key not configured. Please add it in Settings.')
-    }
-
     const result = await spark.llm(prompt, 'gpt-4o', true)
     
     if (!result || result.trim().length === 0) {
-      throw new Error('Empty response from AI service. Please check your OpenAI API key.')
+      throw new Error('Empty response from AI service.')
     }
 
     let parsed
@@ -725,17 +689,10 @@ Return ONLY a JSON object in this exact format:
 Ensure destinations are diverse geographically, culturally distinct, and genuinely match the specified interests and constraints.`
 
   try {
-    const apiKeys = await getStoredAPIKeys()
-    const envKey = import.meta.env.VITE_OPENAI_API_KEY
-    
-    if (!apiKeys?.openai_api_key && !envKey) {
-      throw new Error('OpenAI API key not configured. Please add it in Settings.')
-    }
-
     const result = await spark.llm(prompt, 'gpt-4o', true)
     
     if (!result || result.trim().length === 0) {
-      throw new Error('Empty response from AI service. Please check your OpenAI API key.')
+      throw new Error('Empty response from AI service.')
     }
 
     let parsed
