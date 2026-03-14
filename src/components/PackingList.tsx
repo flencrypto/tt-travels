@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Backpack, Sparkle, Check, Plus, Trash, CloudRain, Sun, Snowflake, Info } from '@phosphor-icons/react'
+import { Backpack, Plus, Trash, CloudRain, Sun, Snowflake } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -34,13 +34,13 @@ export function PackingList({
   destination,
   duration,
   travelStyle,
-  budget,
-  groupType,
+  budget: _budget,
+  groupType: _groupType,
   items,
   onItemsChange,
 }: PackingListProps) {
   const [customItem, setCustomItem] = useState('')
-  const [savedLists, setSavedLists] = useKV<Record<string, PackingItem[]>>('packing-lists', {})
+  const [, setSavedLists] = useKV<Record<string, PackingItem[]>>('packing-lists', {})
 
   const categories = Array.from(new Set(items.map((item) => item.category)))
 

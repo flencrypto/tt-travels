@@ -37,7 +37,7 @@ export function RoutePlanner() {
   const [totalDuration, setTotalDuration] = useState(0)
   const [loading, setLoading] = useState(false)
   const [unit, setUnit] = useState<'metric' | 'imperial'>('metric')
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lon: number } | null>(null)
+  const [, setCurrentLocation] = useState<{ lat: number; lon: number } | null>(null)
   const [isOptimized, setIsOptimized] = useState(false)
 
   const addDestination = () => {
@@ -99,7 +99,7 @@ export function RoutePlanner() {
       ))
 
       toast.success('Using current location as starting point')
-    } catch (error) {
+    } catch {
       toast.error('Unable to retrieve your location')
     }
   }
@@ -295,7 +295,7 @@ export function RoutePlanner() {
   const nearestNeighborOptimization = (
     start: Destination,
     waypoints: Destination[],
-    end: Destination
+    _end: Destination
   ): Destination[] => {
     if (waypoints.length === 0) return []
     if (waypoints.length === 1) return waypoints

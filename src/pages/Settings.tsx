@@ -25,7 +25,7 @@ export function Settings() {
   const [apiKeys, setApiKeys] = useKV<APIKeys>('tt-travels-api-keys', {})
   const { theme, toggleTheme } = useTheme()
   const { isSynced, isSignedIn } = useClerkSync()
-  const { user } = useUser()
+  useUser()
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
   const [validationResults, setValidationResults] = useState<{
     amadeus?: APIValidationResult
@@ -33,7 +33,7 @@ export function Settings() {
   const [isTestingAll, setIsTestingAll] = useState(false)
   const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
   const [isOwner, setIsOwner] = useState<boolean>(false)
-  const [isCheckingOwnership, setIsCheckingOwnership] = useState(true)
+  const [, setIsCheckingOwnership] = useState(true)
 
   useEffect(() => {
     const checkOwnership = async () => {

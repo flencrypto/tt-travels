@@ -1,4 +1,3 @@
-/// <reference path="../vite-env.d.ts" />
 import type { WeatherData, Integration, FlightSearchParams, FlightOffer, HotelSearchParams, HotelOffer } from './types'
 
 export class MissingApiKeyError extends Error {
@@ -147,7 +146,7 @@ export async function generateMediaDescription(
   mediaTypes: { images: number; videos: number },
   location?: string
 ): Promise<string> {
-  const mediaDescription = []
+  const mediaDescription: string[] = []
   if (mediaTypes.images > 0) {
     mediaDescription.push(`${mediaTypes.images} photo${mediaTypes.images > 1 ? 's' : ''}`)
   }
@@ -456,7 +455,7 @@ async function fetchDestinationWeather(destination: string): Promise<Destination
       condition: weatherConditions[weatherCode] || 'varied',
       unit: '°C',
     }
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -601,7 +600,7 @@ Be specific to ${destination} - mention actual landmarks, neighborhoods, and loc
     let parsed
     try {
       parsed = JSON.parse(result)
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse AI response:', result)
       throw new Error(`Invalid JSON response from AI. Please try again.`)
     }
@@ -611,12 +610,12 @@ Be specific to ${destination} - mention actual landmarks, neighborhoods, and loc
       throw new Error('AI response format incorrect. Please try again.')
     }
 
-    const activities = parsed.activities.map((activity: any) => ({
-      name: activity.name || 'Unknown Activity',
-      description: activity.description || '',
-      category: activity.category || 'General',
-      suitability: activity.suitability || 'good',
-      weatherReason: activity.weatherReason || '',
+    const activities = parsed.activities.map((activity: Record<string, unknown>) => ({
+      name: (activity.name as string) || 'Unknown Activity',
+      description: (activity.description as string) || '',
+      category: (activity.category as string) || 'General',
+      suitability: (activity.suitability as string) || 'good',
+      weatherReason: (activity.weatherReason as string) || '',
       tips: Array.isArray(activity.tips) ? activity.tips : [],
     }))
 
@@ -698,7 +697,7 @@ Ensure destinations are diverse geographically, culturally distinct, and genuine
     let parsed
     try {
       parsed = JSON.parse(result)
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse AI response:', result)
       throw new Error(`Invalid JSON response from AI. Please try again.`)
     }

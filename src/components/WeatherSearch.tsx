@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MagnifyingGlass, MapPin, ThermometerSimple, X, Warning } from '@phosphor-icons/react'
+import { MagnifyingGlass, MapPin, Warning } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -143,7 +143,7 @@ export function WeatherSearch({ onLocationSelect, temperatureUnit }: WeatherSear
       setSearchQuery('')
       setResults([])
       setHasSearched(false)
-    } catch (err) {
+    } catch {
       setError('Failed to fetch weather data for this location')
     }
   }

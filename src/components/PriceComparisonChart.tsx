@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { searchFlights, searchHotels, MissingApiKeyError } from '@/lib/api'
 import { toast } from 'sonner'
 import { ChartLine, MagnifyingGlass } from '@phosphor-icons/react'
-import { addDays, format, differenceInDays } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import type { FlightSearchParams, HotelSearchParams } from '@/lib/types'
 
 interface PriceDataPoint {
@@ -232,7 +232,7 @@ export function PriceComparisonChart({ type }: PriceComparisonChartProps) {
             <div className="relative h-64 bg-gradient-to-br from-background to-muted/30 rounded-lg border p-6">
               <div className="absolute inset-0 p-6">
                 <div className="relative h-full flex items-end justify-between gap-2">
-                  {priceData.map((point, index) => {
+                  {priceData.map((point, _index) => {
                     const heightPercent = ((point.price - minPrice) / (maxPrice - minPrice || 1)) * 100
                     const isLowest = point.price === minPrice
                     const isHighest = point.price === maxPrice

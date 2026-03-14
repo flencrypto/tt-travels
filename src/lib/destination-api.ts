@@ -1,4 +1,3 @@
-/// <reference path="../vite-env.d.ts" />
 export interface Attraction {
   name: string
   description: string
@@ -150,6 +149,7 @@ Be specific, accurate, and practical. Include real place names, specific tips, a
         }
       }
     } catch {
+      // Geocoding is optional, continue without coordinates
     }
     
     return parsed

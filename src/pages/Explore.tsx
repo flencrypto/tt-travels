@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { ActivityRecommendations } from '@/components/ActivityRecommendations'
 import { GeoLocalRecommendations } from '@/components/GeoLocalRecommendations'
 import { WeatherSearch, type GeocodingResult } from '@/components/WeatherSearch'
-import { fetchWeather } from '@/lib/api'
 import type { Coordinates, WeatherData } from '@/lib/types'
 import { useKV } from '@github/spark/hooks'
 import type { Settings } from '@/lib/types'
@@ -114,13 +113,13 @@ export function Explore() {
             const geocodeData = await geocodeResponse.json()
             const city = geocodeData.address?.city || geocodeData.address?.town || geocodeData.address?.village || geocodeData.address?.county || 'your location'
             setDestination(city)
-          } catch (err) {
+          } catch {
             setError('Failed to fetch weather data')
           } finally {
             setLoading(false)
           }
         },
-        (err) => {
+        () => {
           setError('Location access denied. Please enable location permissions.')
           setLoading(false)
         }

@@ -252,7 +252,7 @@ export function AIPlanner() {
         return location.name + (location.country ? `, ${location.country}` : '')
       }
       return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
-    } catch (error) {
+    } catch {
       return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
     }
   }

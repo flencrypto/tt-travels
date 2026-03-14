@@ -24,7 +24,7 @@ export async function geocodeLocation(query: string): Promise<GeoLocation[]> {
       return []
     }
     
-    return data.results.map((result: any) => ({
+    return data.results.map((result: { latitude: number; longitude: number; name: string; country: string; admin1: string; timezone?: string; population?: number }) => ({
       latitude: result.latitude,
       longitude: result.longitude,
       name: result.name,

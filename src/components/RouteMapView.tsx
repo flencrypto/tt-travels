@@ -253,7 +253,7 @@ export function RouteMapView({ destinations }: RouteMapViewProps) {
         .attr('r', currentR * 1.25)
         .attr('stroke-width', 4)
     })
-    .on('mouseout', function(this: SVGGElement, _event: any, d: PlottedDestination) {
+    .on('mouseout', function(this: SVGGElement, _event: MouseEvent, d: PlottedDestination) {
       const index = plottedDestinations.indexOf(d)
       const baseR = (index === 0 || index === plottedDestinations.length - 1) ? 18 : 15
       d3.select(this).select('circle')
@@ -262,7 +262,7 @@ export function RouteMapView({ destinations }: RouteMapViewProps) {
         .attr('r', baseR)
         .attr('stroke-width', 3)
     })
-    .on('click', (_event: any, d: PlottedDestination) => {
+    .on('click', (_event: MouseEvent, d: PlottedDestination) => {
       setSelectedDestination(d)
     })
 
