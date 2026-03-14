@@ -15,14 +15,131 @@ import { generateItinerary, generatePackingList, MissingApiKeyError, type Itiner
 import { toast } from 'sonner'
 import { useItinerarySearchHistory } from '@/hooks/use-search-history'
 
+const SAMPLE_ITINERARY = `🗼 Paris, France - 5 Day Cultural Adventure
+
+DAY 1: ARRIVAL & INTRODUCTION TO PARIS
+Morning:
+• Arrive at Charles de Gaulle Airport
+• Check into hotel in Le Marais district (great for culture & walkability)
+• Light breakfast at a local café (try a croissant and café au lait)
+
+Afternoon:
+• Stroll through Le Marais neighborhood
+• Visit Place des Vosges, Paris's oldest planned square
+• Explore vintage boutiques and art galleries
+• Lunch at L'As du Fallafel (famous falafel spot)
+
+Evening:
+• Walk along the Seine River at sunset
+• Visit Pont des Arts and Pont Neuf bridges
+• Dinner at a traditional bistro in Saint-Germain-des-Prés
+• Evening walk around Notre-Dame Cathedral (exterior viewing)
+
+DAY 2: ICONIC LANDMARKS
+Morning:
+• Early visit to the Louvre Museum (arrive at opening to avoid crowds)
+• See the Mona Lisa, Venus de Milo, and Winged Victory
+• Explore Egyptian antiquities and Renaissance paintings (3-4 hours)
+
+Afternoon:
+• Lunch at Café Marly overlooking the Louvre courtyard
+• Walk through Tuileries Garden
+• Visit Place de la Concorde
+• Stroll up the Champs-Élysées to the Arc de Triomphe
+• Climb to the top of Arc de Triomphe for panoramic views
+
+Evening:
+• Metro to Trocadéro for Eiffel Tower photo opportunities
+• Pre-booked ticket to climb the Eiffel Tower at sunset
+• Enjoy champagne at the tower's champagne bar
+• Dinner in the 7th arrondissement
+
+DAY 3: ARTISTIC MONTMARTRE & SACRÉ-CŒUR
+Morning:
+• Breakfast in Montmartre at a local café
+• Visit Sacré-Cœur Basilica early morning
+• Explore the artistic heart of Montmartre
+• See Place du Tertre with street artists
+
+Afternoon:
+• Visit the Musée de Montmartre
+• Lunch at La Maison Rose (iconic pink restaurant)
+• Walk to Moulin Rouge area
+• Visit the Musée d'Orsay (Impressionist masterpieces)
+
+Evening:
+• Sunset from the Musée d'Orsay's 5th floor
+• Dinner cruise on the Seine River with Bateaux Parisiens
+• See illuminated monuments from the water
+
+DAY 4: VERSAILLES DAY TRIP
+Morning:
+• Early train to Versailles (book tickets in advance)
+• Tour the Palace of Versailles and Hall of Mirrors
+• Explore the State Apartments
+
+Afternoon:
+• Lunch at Angelina tearoom in Versailles
+• Walk through the magnificent Gardens of Versailles
+• Visit Marie Antoinette's Estate and The Trianon
+• Rent a bicycle or golf cart to explore the vast grounds
+
+Evening:
+• Return to Paris by late afternoon
+• Relaxing evening in Le Marais
+• Dinner at a traditional French brasserie
+• Try escargot, coq au vin, or duck confit
+
+DAY 5: FINAL DAY - LATIN QUARTER & HIDDEN GEMS
+Morning:
+• Breakfast in the Latin Quarter
+• Visit the Panthéon
+• Explore Shakespeare and Company bookstore
+• Walk through Luxembourg Gardens
+
+Afternoon:
+• Lunch at a crêperie on Rue Mouffetard
+• Visit Sainte-Chapelle for stunning stained glass
+• Browse the bouquinistes (book stalls) along the Seine
+• Last-minute shopping or museum visits
+
+Evening:
+• Farewell dinner at a rooftop restaurant with Eiffel Tower views
+• Final walk along the Seine
+• Enjoy a macaron from Pierre Hermé or Ladurée
+
+💡 TRAVEL TIPS:
+• Purchase a Paris Museum Pass for skip-the-line access
+• Use the Metro (buy a carnet of 10 tickets or Navigo pass)
+• Most museums closed on Mondays or Tuesdays
+• Book Eiffel Tower and Versailles tickets well in advance
+• Learn basic French phrases (bonjour, merci, s'il vous plaît)
+• Restaurants often close between lunch (2pm) and dinner (7pm)
+• Tipping: Service charge included, but small tip (5-10%) appreciated
+
+🍽️ MUST-TRY FOODS:
+• Croissants and pain au chocolat for breakfast
+• French onion soup
+• Steak frites
+• Crème brûlée
+• Macarons
+• French wine and cheese
+
+Estimated Daily Budget (Moderate):
+• Accommodation: €100-150/night
+• Meals: €50-70/day
+• Attractions: €40-60/day
+• Transportation: €10-15/day
+• Total: Approximately €200-295 per day`
+
 export function AIPlanner() {
-  const [destination, setDestination] = useState('')
-  const [duration, setDuration] = useState('3')
-  const [travelStyle, setTravelStyle] = useState('balanced')
+  const [destination, setDestination] = useState('Paris, France')
+  const [duration, setDuration] = useState('5')
+  const [travelStyle, setTravelStyle] = useState('culture')
   const [budget, setBudget] = useState('moderate')
   const [groupType, setGroupType] = useState('solo')
   const [pace, setPace] = useState('moderate')
-  const [itinerary, setItinerary] = useState<string | null>(null)
+  const [itinerary, setItinerary] = useState<string | null>(SAMPLE_ITINERARY)
   const [packingList, setPackingList] = useState<PackingListItem[]>([])
   const [loading, setLoading] = useState(false)
   const [packingLoading, setPackingLoading] = useState(false)
