@@ -97,22 +97,22 @@ This is a full-featured travel platform with authentication, multiple specialize
 
 ## Design Direction
 
-The design should feel modern, vibrant, and premium - like a high-end travel tech startup. Bold color choices, glass morphism effects, and smooth animations create an exciting yet professional atmosphere that makes travel planning feel fresh and enjoyable.
+The design should feel clean, minimal, and refined - like a premium design studio. Pure white aesthetics with subtle grays and careful use of shadows create a sophisticated, distraction-free atmosphere that puts content first and makes travel planning feel elegant and focused.
 
 ## Color Selection
 
-A vibrant palette combining deep purples with warm oranges to evoke both sophistication and adventure:
+A clean, minimal white palette with subtle grays for a pure and sophisticated aesthetic:
 
-- **Primary Color**: Rich Purple `oklch(0.42 0.12 280)` - Premium brand color for navigation and key actions, conveys sophistication and creativity
+- **Primary Color**: Pure White `oklch(0.98 0 0)` - Clean, minimal brand color conveying simplicity and clarity
 - **Secondary Colors**: 
-  - Soft Lavender `oklch(0.88 0.05 290)` - Light backgrounds and subtle accents
-  - Muted Purple `oklch(0.75 0.08 285)` - Secondary UI elements
-- **Accent Color**: Warm Orange `oklch(0.68 0.18 45)` - Attention-grabbing for CTAs, active states, and important highlights - evokes energy and excitement
+  - Light Gray `oklch(0.96 0 0)` - Subtle backgrounds and dividers
+  - Medium Gray `oklch(0.90 0 0)` - Borders and inactive elements
+- **Accent Color**: Off-White `oklch(0.98 0 0)` - Subtle highlights maintaining the white aesthetic
 - **Foreground/Background Pairings**:
-  - Background (Soft Lavender): Deep Charcoal (#1A1D23) - Ratio 11.5:1 ✓
-  - Primary (Rich Purple): White text (#FFFFFF) - Ratio 6.9:1 ✓
-  - Accent (Warm Orange): Deep Charcoal (#1A1D23) - Ratio 5.1:1 ✓
-  - Card (White): Deep Charcoal (#1A1D23) - Ratio 14.5:1 ✓
+  - Background (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
+  - Primary (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
+  - Card (White): Dark Gray (#333333) - Ratio 12.6:1 ✓
+  - Borders (Light Gray): All text passes WCAG AA ✓
 
 ## Font Selection
 
