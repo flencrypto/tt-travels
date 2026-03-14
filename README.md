@@ -30,6 +30,20 @@ npm run dev
 
 Visit `http://localhost:5173` and sign in to start planning! 🎉
 
+### 4. Optional: Configure Flight & Hotel Search
+Want to search real flights and hotels? Set up Amadeus API in 5 minutes:
+
+👉 **[View AMADEUS_SETUP_GUIDE.md](./AMADEUS_SETUP_GUIDE.md)** for complete instructions
+
+**Quick Setup:**
+1. Create free account at [developers.amadeus.com](https://developers.amadeus.com)
+2. Create an app and copy API Key + Secret
+3. Go to Settings page in TT Travels
+4. Paste credentials and click Test
+5. Save and start searching! ✈️
+
+**Note:** The test environment is completely free with realistic data.
+
 ## ✨ Features
 
 - 🤖 **AI Trip Planner** - Generate personalized itineraries with smart packing lists
@@ -54,6 +68,8 @@ Visit `http://localhost:5173` and sign in to start planning! 🎉
 
 - 📋 [PRD.md](./PRD.md) - Product requirements and feature specifications
 - 🔐 [CLERK_SETUP.md](./CLERK_SETUP.md) - Complete authentication setup guide with OAuth
+- ✈️ [AMADEUS_SETUP_GUIDE.md](./AMADEUS_SETUP_GUIDE.md) - **Configure flight & hotel search** (5-minute setup)
+- 🔑 [API_KEYS_SETUP_GUIDE.md](./API_KEYS_SETUP_GUIDE.md) - Complete API configuration guide
 - 🐛 [QUICK_DEBUG.md](./QUICK_DEBUG.md) - **START HERE** for troubleshooting
 - ✅ [DEBUG_CHECKLIST.md](./DEBUG_CHECKLIST.md) - Comprehensive debugging guide
 - 🔒 [SECURITY.md](./SECURITY.md) - Security policies and guidelines

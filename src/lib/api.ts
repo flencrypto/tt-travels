@@ -273,11 +273,18 @@ async function getAmadeusAccessToken(): Promise<string> {
     return amadeusAccessToken
   }
 
-  const apiKey = import.meta.env.VITE_AMADEUS_API_KEY
-  const apiSecret = import.meta.env.VITE_AMADEUS_API_SECRET
+  const apiKeys = await spark.kv.get<{ amadeus_api_key?: string; amadeus_api_secret?: string }>('tt-travels-api-keys')
+  
+  let apiKey = apiKeys?.amadeus_api_key
+  let apiSecret = apiKeys?.amadeus_api_secret
 
   if (!apiKey || !apiSecret) {
-    throw new MissingApiKeyError('Amadeus API credentials are not configured')
+    apiKey = import.meta.env.VITE_AMADEUS_API_KEY
+    apiSecret = import.meta.env.VITE_AMADEUS_API_SECRET
+  }
+
+  if (!apiKey || !apiSecret) {
+    throw new MissingApiKeyError('Amadeus API credentials are not configured. Please add them in Settings.')
   }
 
   try {

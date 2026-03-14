@@ -1,13 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AirplaneTilt, Buildings, ChartLine } from '@phosphor-icons/react'
 import { FlightSearch } from '@/components/FlightSearch'
 import { HotelSearch } from '@/components/HotelSearch'
 import { PriceComparisonChart } from '@/components/PriceComparisonChart'
+import { AmadeusSetupBanner } from '@/components/AmadeusSetupBanner'
+import { useKV } from '@github/spark/hooks'
+import type { APIKeys } from '@/lib/types'
 
 export function Bookings() {
   const [activeTab, setActiveTab] = useState('flights')
+  const [apiKeys] = useKV<APIKeys>('tt-travels-api-keys', {})
+  const [isAmadeusConfigured, setIsAmadeusConfigured] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const hasEnvKeys = !!(import.meta.env.VITE_AMADEUS_API_KEY && import.meta.env.VITE_AMADEUS_API_SECRET)
+    const hasStoredKeys = !!(apiKeys?.amadeus_api_key && apiKeys?.amadeus_api_secret)
+    setIsAmadeusConfigured(hasEnvKeys || hasStoredKeys)
+  }, [apiKeys])
 
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
@@ -20,6 +33,15 @@ export function Bookings() {
           Search and compare flights and hotels in real-time
         </p>
       </div>
+
+      {!isAmadeusConfigured && (
+        <div className="max-w-6xl mx-auto">
+          <AmadeusSetupBanner 
+            isConfigured={isAmadeusConfigured}
+            onNavigateToSettings={() => navigate('/settings')}
+          />
+        </div>
+      )}
 
       <div className="max-w-6xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
