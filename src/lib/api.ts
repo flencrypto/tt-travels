@@ -149,6 +149,42 @@ Travel Tips:
 - Stay hydrated and respect local customs`
 }
 
+export async function generateMediaDescription(
+  mediaCount: number,
+  mediaTypes: { images: number; videos: number },
+  location?: string
+): Promise<string> {
+  const mediaDescription = []
+  if (mediaTypes.images > 0) {
+    mediaDescription.push(`${mediaTypes.images} photo${mediaTypes.images > 1 ? 's' : ''}`)
+  }
+  if (mediaTypes.videos > 0) {
+    mediaDescription.push(`${mediaTypes.videos} video${mediaTypes.videos > 1 ? 's' : ''}`)
+  }
+
+  const prompt = spark.llmPrompt`You are a creative travel writer helping travelers document their adventures. Generate an engaging, descriptive caption for a travel journal entry.
+
+Media Content: ${mediaDescription.join(' and ')}
+${location ? `Location: ${location}` : 'Location: Not specified'}
+
+Create a compelling 2-3 sentence description that:
+- Captures the essence and emotion of the travel experience
+- Is authentic and personal in tone
+- Incorporates relevant travel and location context if location is provided
+- Includes relevant hashtags at the end (3-5 travel-related hashtags)
+- Is suitable for social media sharing (Instagram, Facebook, TikTok)
+- Feels genuine and not overly promotional
+
+Keep it concise, engaging, and travel-focused. Make it feel like a real traveler sharing their experience.`
+
+  try {
+    const result = await spark.llm(prompt, 'gpt-4o')
+    return result.trim() || 'Capturing memories from my travels...'
+  } catch (error) {
+    throw new Error(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
 export async function fetchWeather(
   lat: number,
   lng: number,

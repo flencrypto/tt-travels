@@ -186,6 +186,7 @@ This app comes with Clerk **fully integrated** out of the box:
 
 Edit `src/main.tsx` to customize Clerk's appearance:
 
+{% raw %}
 ```typescript
 <ClerkProvider 
   publishableKey={publishableKey}
@@ -202,6 +203,7 @@ Edit `src/main.tsx` to customize Clerk's appearance:
   }}
 >
 ```
+{% endraw %}
 
 ### Configure Sign-In Methods
 
