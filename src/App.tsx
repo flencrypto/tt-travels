@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ClerkProvider } from '@clerk/react'
 import { Toaster } from './components/ui/sonner'
 import { Navigation } from './components/Navigation'
 import { Dashboard } from './pages/Dashboard'
@@ -27,30 +28,34 @@ export type FavoriteDestination = Destination & {
   notes?: string
 }
 
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_placeholder'
+
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="lg:ml-64">
-          <div className="container mx-auto px-4 py-6">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/setup" element={<Setup />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/ai-planner" element={<AIPlanner />} />
-              <Route path="/route-planner" element={<RoutePlanner />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/trips" element={<Trips />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/journal" element={<Journal />} />
-              <Route path="/settings" element={<Settings />} />
-            </Routes>
-          </div>
-        </main>
-      </div>
-      <Toaster />
-    </BrowserRouter>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <BrowserRouter>
+        <div className="min-h-screen bg-background">
+          <Navigation />
+          <main>
+            <div className="container mx-auto px-4 py-6">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/setup" element={<Setup />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/ai-planner" element={<AIPlanner />} />
+                <Route path="/route-planner" element={<RoutePlanner />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/trips" element={<Trips />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/journal" element={<Journal />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </div>
+          </main>
+        </div>
+        <Toaster />
+      </BrowserRouter>
+    </ClerkProvider>
   )
 }
 

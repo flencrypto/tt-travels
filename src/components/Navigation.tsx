@@ -8,7 +8,7 @@ import { SyncStatusIndicator } from '@/components/SyncStatusIndicator'
 import { ClerkSetupBanner } from '@/components/ClerkSetupBanner'
 
 const routes = [
-  { path: '/dashboard', label: 'Dashboard', icon: House },
+  { path: '/', label: 'Dashboard', icon: House },
   { path: '/explore', label: 'Explore', icon: MapPin },
   { path: '/favorites', label: 'Favorites', icon: Heart },
   { path: '/bookings', label: 'Bookings', icon: Ticket },
