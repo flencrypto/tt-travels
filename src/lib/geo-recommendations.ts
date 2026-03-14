@@ -1,4 +1,3 @@
-/// <reference path="../vite-env.d.ts" />
 export interface GeoRecommendation {
   name: string
   category: string
@@ -22,7 +21,7 @@ export async function generateGeoLocalRecommendations(
   type: 'things-to-do' | 'places-to-eat'
 ): Promise<GeoRecommendationsResponse> {
   const recommendationType = type === 'things-to-do' ? 'attractions, activities, and experiences' : 'restaurants, cafes, bars, and food experiences'
-  const categoryType = type === 'things-to-do' ? 'activities' : 'dining'
+  const _categoryType = type === 'things-to-do' ? 'activities' : 'dining'
 
   const prompt = spark.llmPrompt`You are a knowledgeable local expert and travel guide with deep insider knowledge of ${locationName} (coordinates: ${latitude}, ${longitude}).
 

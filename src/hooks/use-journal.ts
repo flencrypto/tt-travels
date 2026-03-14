@@ -1,5 +1,5 @@
 import { useKV } from '@github/spark/hooks'
-import type { JournalEntry, JournalMedia } from '@/lib/types'
+import type { JournalEntry } from '@/lib/types'
 
 export function useJournal() {
   const [entries, setEntries] = useKV<JournalEntry[]>('tt-travels-journal-entries', [])

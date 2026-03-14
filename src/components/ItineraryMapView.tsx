@@ -207,14 +207,14 @@ export function ItineraryMapView({ itinerary, destination }: ItineraryMapViewPro
         .attr('r', currentR * 1.3)
         .attr('stroke-width', 3.5)
     })
-    .on('mouseout', function(this: SVGGElement, _event: any, d: PlottedLocation) {
+    .on('mouseout', function(this: SVGGElement, _event: MouseEvent, d: PlottedLocation) {
       d3.select(this).select('circle')
         .transition()
         .duration(200)
         .attr('r', d.type === 'destination' ? 14 : 10)
         .attr('stroke-width', 2.5)
     })
-    .on('click', (_event: any, d: PlottedLocation) => {
+    .on('click', (_event: MouseEvent, d: PlottedLocation) => {
       setSelectedLocation(d)
     })
 
@@ -360,7 +360,7 @@ Return ONLY a valid JSON object in this exact format:
 Focus on the most important 10-15 locations from the itinerary.`
 
   try {
-    const result = await (window as any).spark.llm(promptText, 'gpt-4o-mini', true)
+    const result = await spark.llm(promptText, 'gpt-4o-mini', true)
     const parsed = JSON.parse(result)
     const extractedLocations = parsed.locations || []
 

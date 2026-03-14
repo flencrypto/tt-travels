@@ -12,7 +12,7 @@ interface DistanceInfoProps {
   className?: string
 }
 
-export function DistanceInfo({ destination, destinationName, compact = false, className = '' }: DistanceInfoProps) {
+export function DistanceInfo({ destination, destinationName: _destinationName, compact = false, className = '' }: DistanceInfoProps) {
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null)
   const [distance, setDistance] = useState<DistanceResult | null>(null)
   const [loading, setLoading] = useState(true)

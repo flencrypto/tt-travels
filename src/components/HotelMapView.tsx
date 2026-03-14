@@ -154,7 +154,7 @@ export function HotelMapView({ hotels, provider, onSelectHotel }: HotelMapViewPr
             return parseFloat(d3.select(this).attr('r')) * 1.15
           })
       })
-      .on('mouseout', function(this: SVGCircleElement, _event: any, d: HotelLocation) {
+      .on('mouseout', function(this: SVGCircleElement, _event: MouseEvent, d: HotelLocation) {
         d3.select(this)
           .transition()
           .duration(200)
@@ -162,7 +162,7 @@ export function HotelMapView({ hotels, provider, onSelectHotel }: HotelMapViewPr
           .attr('stroke-width', 2.5)
           .attr('r', radiusScale(parseFloat(d.hotel.offers?.[0]?.price.total || '0')))
       })
-      .on('click', (_event: any, d: HotelLocation) => {
+      .on('click', (_event: MouseEvent, d: HotelLocation) => {
         setSelectedHotel(d.hotel)
       })
 

@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Heart, MapPin, Trash, NotePencil, MapTrifold, Calendar, ArrowRight } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
+import { Heart, MapPin, NotePencil, MapTrifold, ArrowRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -12,7 +11,6 @@ import { toast } from 'sonner'
 
 export function Favorites() {
   const { favorites, removeFavorite, updateNotes } = useFavorites()
-  const navigate = useNavigate()
   const [editingNotes, setEditingNotes] = useState<string | null>(null)
   const [notesText, setNotesText] = useState('')
 

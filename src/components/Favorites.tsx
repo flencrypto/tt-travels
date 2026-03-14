@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Heart, MapPin, Plus, X } from '@phosphor-icons/react'
+import { Heart, MapPin, Plus } from '@phosphor-icons/react'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'

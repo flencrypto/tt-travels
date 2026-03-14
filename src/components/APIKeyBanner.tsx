@@ -93,7 +93,7 @@ export function APIKeyBanner({ requiredKeys, apiKeys, showIfConfigured = false }
             <div className="space-y-2">
               <p className="text-xs font-medium text-amber-900 dark:text-amber-100">Missing Keys:</p>
               <div className="flex flex-wrap gap-2">
-                {missingKeys.map(({ name, feature }) => (
+                {missingKeys.map(({ name, feature: _feature }) => (
                   <Badge 
                     key={name}
                     variant="outline" 
