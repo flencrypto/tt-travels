@@ -33,7 +33,7 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_p
 function App() {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <BrowserRouter>
+      <BrowserRouter basename="/tt-travels">
         <div className="min-h-screen bg-background">
           <Navigation />
           <main>
