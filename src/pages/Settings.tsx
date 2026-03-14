@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning, CloudCheck, Cloud, DownloadSimple, UploadSimple } from '@phosphor-icons/react'
+import { useState, useRef, useEffect } from 'react'
+import { Gear, Check, Moon, Sun, Key, Eye, EyeSlash, CheckCircle, XCircle, WarningCircle, Lightning, CloudCheck, Cloud, DownloadSimple, UploadSimple, LockKey, ShieldCheck } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AuthStatus } from '@/components/AuthStatus'
 import { useKV } from '@github/spark/hooks'
 import { useTheme } from '@/hooks/use-theme'
@@ -52,6 +53,23 @@ export function Settings() {
   const [isTestingAll, setIsTestingAll] = useState(false)
   const [isTesting, setIsTesting] = useState<Record<string, boolean>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isOwner, setIsOwner] = useState<boolean>(false)
+  const [isCheckingOwnership, setIsCheckingOwnership] = useState(true)
+
+  useEffect(() => {
+    const checkOwnership = async () => {
+      try {
+        const currentUser = await spark.user()
+        setIsOwner(currentUser.isOwner)
+      } catch (error) {
+        console.error('Failed to check ownership:', error)
+        setIsOwner(false)
+      } finally {
+        setIsCheckingOwnership(false)
+      }
+    }
+    checkOwnership()
+  }, [])
 
   const handleSaveSettings = () => {
     toast.success('Settings saved successfully!')
@@ -470,53 +488,81 @@ export function Settings() {
             <div className="flex items-center gap-2">
               <Key size={24} className="text-primary" weight="fill" />
               <div>
-                <CardTitle>API Keys</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  API Keys
+                  {!isCheckingOwnership && !isOwner && (
+                    <Badge variant="secondary" className="text-xs">
+                      <LockKey size={14} className="mr-1" weight="fill" />
+                      View Only
+                    </Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>
-                  Configure API keys for third-party services (stored locally)
+                  {isOwner 
+                    ? 'Configure API keys for third-party services (stored locally)'
+                    : 'API keys configured by the app owner are available to all users'
+                  }
                 </CardDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={exportAPIKeys}
-                disabled={!apiKeys || Object.keys(apiKeys).length === 0}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <DownloadSimple size={18} weight="bold" />
-                Export
-              </Button>
-              <Button
-                onClick={triggerImport}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <UploadSimple size={18} weight="bold" />
-                Import
-              </Button>
-              <Button
-                onClick={testAllAPIConnections}
-                disabled={isTestingAll || !apiKeys || Object.keys(apiKeys).length === 0}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <Lightning size={18} weight="fill" />
-                Test All
-              </Button>
-            </div>
+            {isOwner && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={exportAPIKeys}
+                  disabled={!apiKeys || Object.keys(apiKeys).length === 0}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <DownloadSimple size={18} weight="bold" />
+                  Export
+                </Button>
+                <Button
+                  onClick={triggerImport}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <UploadSimple size={18} weight="bold" />
+                  Import
+                </Button>
+                <Button
+                  onClick={testAllAPIConnections}
+                  disabled={isTestingAll || !apiKeys || Object.keys(apiKeys).length === 0}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Lightning size={18} weight="fill" />
+                  Test All
+                </Button>
+              </div>
+            )}
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={importAPIKeys}
-            className="hidden"
-          />
+          {isOwner && (
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={importAPIKeys}
+              className="hidden"
+            />
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
+          {!isCheckingOwnership && !isOwner && (
+            <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+              <ShieldCheck size={20} weight="fill" className="text-blue-600" />
+              <AlertDescription className="text-blue-900 dark:text-blue-100">
+                <p className="font-medium mb-1">Shared API Access</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  The app owner has configured API keys that enable full functionality for all users. 
+                  You can use all features without setting up your own keys. 
+                  API key details are hidden for security, but all services remain fully functional.
+                </p>
+              </AlertDescription>
+            </Alert>
+          )}
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-2">
               <Label htmlFor="amadeus-api-key">Amadeus API Key</Label>
@@ -526,23 +572,27 @@ export function Settings() {
               <Input
                 id="amadeus-api-key"
                 type={showKeys['amadeus_api_key'] ? 'text' : 'password'}
-                placeholder="Enter your Amadeus API key"
+                placeholder={isOwner ? "Enter your Amadeus API key" : "Configured by owner"}
                 value={apiKeys?.amadeus_api_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, amadeus_api_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.amadeus_api_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('amadeus_api_key')}
-              >
-                {showKeys['amadeus_api_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => toggleKeyVisibility('amadeus_api_key')}
+                >
+                  {showKeys['amadeus_api_key'] ? (
+                    <EyeSlash size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </Button>
+              )}
             </div>
             {validationResults.amadeus && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -572,38 +622,44 @@ export function Settings() {
               <Input
                 id="amadeus-api-secret"
                 type={showKeys['amadeus_api_secret'] ? 'text' : 'password'}
-                placeholder="Enter your Amadeus API secret"
+                placeholder={isOwner ? "Enter your Amadeus API secret" : "Configured by owner"}
                 value={apiKeys?.amadeus_api_secret || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, amadeus_api_secret: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.amadeus_api_secret ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('amadeus_api_secret')}
-              >
-                {showKeys['amadeus_api_secret'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testAmadeusConnection}
-                disabled={isTesting.amadeus || !apiKeys?.amadeus_api_key || !apiKeys?.amadeus_api_secret}
-                className="gap-2"
-              >
-                {isTesting.amadeus ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('amadeus_api_secret')}
+                  >
+                    {showKeys['amadeus_api_secret'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testAmadeusConnection}
+                    disabled={isTesting.amadeus || !apiKeys?.amadeus_api_key || !apiKeys?.amadeus_api_secret}
+                    className="gap-2"
+                  >
+                    {isTesting.amadeus ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -618,38 +674,44 @@ export function Settings() {
               <Input
                 id="openweather-api-key"
                 type={showKeys['openweather_api_key'] ? 'text' : 'password'}
-                placeholder="Enter your OpenWeather API key"
+                placeholder={isOwner ? "Enter your OpenWeather API key" : "Configured by owner"}
                 value={apiKeys?.openweather_api_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, openweather_api_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.openweather_api_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('openweather_api_key')}
-              >
-                {showKeys['openweather_api_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testOpenWeatherConnection}
-                disabled={isTesting.openweather || !apiKeys?.openweather_api_key}
-                className="gap-2"
-              >
-                {isTesting.openweather ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('openweather_api_key')}
+                  >
+                    {showKeys['openweather_api_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testOpenWeatherConnection}
+                    disabled={isTesting.openweather || !apiKeys?.openweather_api_key}
+                    className="gap-2"
+                  >
+                    {isTesting.openweather ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.openweather && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -682,38 +744,44 @@ export function Settings() {
               <Input
                 id="openai-api-key"
                 type={showKeys['openai_api_key'] ? 'text' : 'password'}
-                placeholder="Enter your OpenAI API key (sk-...)"
+                placeholder={isOwner ? "Enter your OpenAI API key (sk-...)" : "Configured by owner"}
                 value={apiKeys?.openai_api_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, openai_api_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.openai_api_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('openai_api_key')}
-              >
-                {showKeys['openai_api_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testOpenAIConnection}
-                disabled={isTesting.openai || !apiKeys?.openai_api_key}
-                className="gap-2"
-              >
-                {isTesting.openai ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('openai_api_key')}
+                  >
+                    {showKeys['openai_api_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testOpenAIConnection}
+                    disabled={isTesting.openai || !apiKeys?.openai_api_key}
+                    className="gap-2"
+                  >
+                    {isTesting.openai ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.openai && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -746,38 +814,44 @@ export function Settings() {
               <Input
                 id="airbnb-api-key"
                 type={showKeys['airbnb_api_key'] ? 'text' : 'password'}
-                placeholder="Enter your Airbnb API key"
+                placeholder={isOwner ? "Enter your Airbnb API key" : "Configured by owner"}
                 value={apiKeys?.airbnb_api_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, airbnb_api_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.airbnb_api_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('airbnb_api_key')}
-              >
-                {showKeys['airbnb_api_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testAirbnbConnection}
-                disabled={isTesting.airbnb || !apiKeys?.airbnb_api_key}
-                className="gap-2"
-              >
-                {isTesting.airbnb ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('airbnb_api_key')}
+                  >
+                    {showKeys['airbnb_api_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testAirbnbConnection}
+                    disabled={isTesting.airbnb || !apiKeys?.airbnb_api_key}
+                    className="gap-2"
+                  >
+                    {isTesting.airbnb ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.airbnb && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -810,38 +884,44 @@ export function Settings() {
               <Input
                 id="mapbox-token"
                 type={showKeys['mapbox_token'] ? 'text' : 'password'}
-                placeholder="Enter your Mapbox access token"
+                placeholder={isOwner ? "Enter your Mapbox access token" : "Configured by owner"}
                 value={apiKeys?.mapbox_token || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, mapbox_token: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.mapbox_token ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('mapbox_token')}
-              >
-                {showKeys['mapbox_token'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testMapboxConnection}
-                disabled={isTesting.mapbox || !apiKeys?.mapbox_token}
-                className="gap-2"
-              >
-                {isTesting.mapbox ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('mapbox_token')}
+                  >
+                    {showKeys['mapbox_token'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testMapboxConnection}
+                    disabled={isTesting.mapbox || !apiKeys?.mapbox_token}
+                    className="gap-2"
+                  >
+                    {isTesting.mapbox ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.mapbox && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -874,38 +954,44 @@ export function Settings() {
               <Input
                 id="aviationstack-key"
                 type={showKeys['aviationstack_key'] ? 'text' : 'password'}
-                placeholder="Enter your AviationStack API key"
+                placeholder={isOwner ? "Enter your AviationStack API key" : "Configured by owner"}
                 value={apiKeys?.aviationstack_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, aviationstack_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.aviationstack_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('aviationstack_key')}
-              >
-                {showKeys['aviationstack_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testAviationStackConnection}
-                disabled={isTesting.aviationstack || !apiKeys?.aviationstack_key}
-                className="gap-2"
-              >
-                {isTesting.aviationstack ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('aviationstack_key')}
+                  >
+                    {showKeys['aviationstack_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testAviationStackConnection}
+                    disabled={isTesting.aviationstack || !apiKeys?.aviationstack_key}
+                    className="gap-2"
+                  >
+                    {isTesting.aviationstack ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.aviationstack && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -938,38 +1024,44 @@ export function Settings() {
               <Input
                 id="yelp-key"
                 type={showKeys['yelp_key'] ? 'text' : 'password'}
-                placeholder="Enter your Yelp API key"
+                placeholder={isOwner ? "Enter your Yelp API key" : "Configured by owner"}
                 value={apiKeys?.yelp_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, yelp_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.yelp_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('yelp_key')}
-              >
-                {showKeys['yelp_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testYelpConnection}
-                disabled={isTesting.yelp || !apiKeys?.yelp_key}
-                className="gap-2"
-              >
-                {isTesting.yelp ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('yelp_key')}
+                  >
+                    {showKeys['yelp_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testYelpConnection}
+                    disabled={isTesting.yelp || !apiKeys?.yelp_key}
+                    className="gap-2"
+                  >
+                    {isTesting.yelp ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.yelp && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -1002,38 +1094,44 @@ export function Settings() {
               <Input
                 id="ticketmaster-key"
                 type={showKeys['ticketmaster_key'] ? 'text' : 'password'}
-                placeholder="Enter your Ticketmaster API key"
+                placeholder={isOwner ? "Enter your Ticketmaster API key" : "Configured by owner"}
                 value={apiKeys?.ticketmaster_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, ticketmaster_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.ticketmaster_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('ticketmaster_key')}
-              >
-                {showKeys['ticketmaster_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testTicketmasterConnection}
-                disabled={isTesting.ticketmaster || !apiKeys?.ticketmaster_key}
-                className="gap-2"
-              >
-                {isTesting.ticketmaster ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('ticketmaster_key')}
+                  >
+                    {showKeys['ticketmaster_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testTicketmasterConnection}
+                    disabled={isTesting.ticketmaster || !apiKeys?.ticketmaster_key}
+                    className="gap-2"
+                  >
+                    {isTesting.ticketmaster ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.ticketmaster && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -1066,38 +1164,44 @@ export function Settings() {
               <Input
                 id="google-maps-key"
                 type={showKeys['google_maps_key'] ? 'text' : 'password'}
-                placeholder="Enter your Google Maps API key"
+                placeholder={isOwner ? "Enter your Google Maps API key" : "Configured by owner"}
                 value={apiKeys?.google_maps_key || ''}
                 onChange={(e) =>
                   setApiKeys((current) => ({ ...current, google_maps_key: e.target.value }))
                 }
+                disabled={!isOwner}
+                className={!isOwner && apiKeys?.google_maps_key ? "bg-muted" : ""}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => toggleKeyVisibility('google_maps_key')}
-              >
-                {showKeys['google_maps_key'] ? (
-                  <EyeSlash size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={testGoogleMapsConnection}
-                disabled={isTesting.googlemaps || !apiKeys?.google_maps_key}
-                className="gap-2"
-              >
-                {isTesting.googlemaps ? (
-                  <>Testing...</>
-                ) : (
-                  <>
-                    <Lightning size={18} weight="fill" />
-                    Test
-                  </>
-                )}
-              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => toggleKeyVisibility('google_maps_key')}
+                  >
+                    {showKeys['google_maps_key'] ? (
+                      <EyeSlash size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={testGoogleMapsConnection}
+                    disabled={isTesting.googlemaps || !apiKeys?.google_maps_key}
+                    className="gap-2"
+                  >
+                    {isTesting.googlemaps ? (
+                      <>Testing...</>
+                    ) : (
+                      <>
+                        <Lightning size={18} weight="fill" />
+                        Test
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </div>
             {validationResults.googlemaps && (
               <div className={`flex items-start gap-2 p-3 rounded-lg text-sm ${
@@ -1119,29 +1223,33 @@ export function Settings() {
             </p>
           </div>
 
-          <Button
-            onClick={handleSaveAPIKeys}
-            className="w-full gap-2"
-            size="lg"
-          >
-            <Check size={20} weight="bold" />
-            Save API Keys
-          </Button>
+          {isOwner && (
+            <>
+              <Button
+                onClick={handleSaveAPIKeys}
+                className="w-full gap-2"
+                size="lg"
+              >
+                <Check size={20} weight="bold" />
+                Save API Keys
+              </Button>
 
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4 space-y-2">
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-              Backup & Restore
-            </p>
-            <p className="text-xs text-blue-700 dark:text-blue-300">
-              Use the <strong>Export</strong> button to download your API keys as a JSON file for backup. 
-              Use <strong>Import</strong> to restore your keys from a previously exported file. 
-              This makes it easy to transfer your configuration between devices or recover from data loss.
-            </p>
-          </div>
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4 space-y-2">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Backup & Restore
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  Use the <strong>Export</strong> button to download your API keys as a JSON file for backup. 
+                  Use <strong>Import</strong> to restore your keys from a previously exported file. 
+                  This makes it easy to transfer your configuration between devices or recover from data loss.
+                </p>
+              </div>
+            </>
+          )}
 
           <div className="rounded-lg bg-muted p-4">
             <p className="text-xs text-muted-foreground">
-              <strong>Privacy Note:</strong> All API keys are stored locally in your browser and never sent to any server except the respective service providers when making API calls.
+              <strong>Privacy Note:</strong> {isOwner ? 'All API keys are stored locally in your browser and never sent to any server except the respective service providers when making API calls.' : 'API keys are configured by the app owner and stored securely. You have full access to all features without needing to set up your own keys.'}
             </p>
           </div>
         </CardContent>
