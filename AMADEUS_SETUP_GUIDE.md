@@ -2,18 +2,18 @@
 
 This guide will help you configure Amadeus API credentials to enable real flight and hotel searches in TT Travels.
 
-## What is Amadeus?
-
-Amadeus for Developers provides travel APIs that power flight search, hotel availability, and booking functionality. The platform offers both a free test environment with realistic data and a production environment for live bookings.
-
-## Prerequisites
+Amadeus for Develop
 
 - A free Amadeus for Developers account
-- 5 minutes to complete setup
 
-## Step 1: Create an Amadeus Account
 
-1. Visit [Amadeus for Developers](https://developers.amadeus.com/)
+
+   - Email address
+   - Company/Organization (ca
+
+## Step 2: Create an App
+
+3. Fill in the app details:
 2. Click **Sign Up** in the top right corner
 3. Fill in your details:
    - Email address
@@ -30,38 +30,38 @@ Amadeus for Developers provides travel APIs that power flight search, hotel avai
    - **App Name**: `TT Travels` (or any name you prefer)
    - **App Description**: `Travel planning and booking application`
    - **Callback URL**: Can be left as default or use `http://localhost`
-4. Click **Create**
+3. **Important**: C
 
-## Step 3: Get Your API Credentials
+### Option A: Via Settings Page (Re
 
-After creating your app, you'll see your credentials:
-
-1. **API Key** (also called Client ID)
-   - Long alphanumeric string (32+ characters)
-   - Example format: `AbCdEf123456GhIjKl789012MnOpQr34`
-   
-2. **API Secret** (also called Client Secret)
-   - Long alphanumeric string (32+ characters)
-   - Example format: `XyZ987abCD654efGH321ijKL098mnOP`
-
-3. **Important**: Copy both values - you'll need them in the next step
-
-## Step 4: Configure API Keys in TT Travels
-
-### Option A: Via Settings Page (Recommended)
-
-1. Open TT Travels application
-2. Navigate to **Settings** page (gear icon in navigation)
 3. Scroll down to the **API Keys** section
-4. Find the **Amadeus API Key** field:
-   - Paste your API Key
+
+5. Find the **Amadeus API Secret** fie
    - Click the eye icon to verify it's correct
-5. Find the **Amadeus API Secret** field:
-   - Paste your API Secret
-   - Click the eye icon to verify it's correct
-6. Click the **Test** button next to the API Secret field
    - This validates your credentials with Amadeus
-   - You should see a green "Verified" badge if successful
+7. 
+### Option B: Via Environment Variables (Alte
+If you prefer to use environment variables:
+1. Open the `.env.local` file in the project root
+
+   VITE_AMADEUS_API_SECRET=your_api_secret_here
+
+
+
+
+
+   - **Destination**: LAX (Los
+   - **Adults**: 1
+4. You should see a list of available flig
+If you see results, congratulations! Y
+## Understanding Test v
+### Test Environment (Default & Free)
+- **URL**: `https://test.api.amadeus.com`
+- **Data**: Realistic test
+- **Best For**: Getting started, learning the 
+TT Travels is configured to use the **test environment** 
+### Production Environment (Paid)
+- **URL**: `https://api.amadeus.com`
 7. Click **Save API Keys** at the bottom
 
 ### Option B: Via Environment Variables (Alternative)
@@ -254,42 +254,42 @@ See [Amadeus Pricing](https://developers.amadeus.com/pricing) for current rates.
 
 - **Official Documentation**: https://developers.amadeus.com/docs
 - **API Reference**: https://developers.amadeus.com/self-service
-- **Code Examples**: https://github.com/amadeus4dev
-- **Support Forum**: https://developers.amadeus.com/support
-- **Status Page**: https://status.amadeus.com/
-- **API Testing Tool**: Postman collections available
 
-## Quick Reference: Common Airport Codes
 
-Use these IATA codes for testing:
 
-| City | Airport | Code |
-|------|---------|------|
-| New York | John F. Kennedy | JFK |
-| Los Angeles | Los Angeles Intl | LAX |
-| London | Heathrow | LHR |
-| Paris | Charles de Gaulle | CDG |
-| Tokyo | Narita | NRT |
-| Sydney | Kingsford Smith | SYD |
-| Dubai | Dubai Intl | DXB |
-| Singapore | Changi | SIN |
-| Hong Kong | Hong Kong Intl | HKG |
-| San Francisco | San Francisco Intl | SFO |
 
-Find more codes at [IATA Airport Codes](https://www.iata.org/en/publications/directories/code-search/).
 
-## Getting Help
 
-If you encounter issues:
 
-1. **Check this guide** - Most common issues are covered above
-2. **Test credentials** - Use the Test button in Settings
-3. **Check Amadeus Status** - Visit https://status.amadeus.com/
-4. **Review API docs** - https://developers.amadeus.com/docs
-5. **Contact Amadeus Support** - Via their developer portal
 
----
 
-**Last Updated**: January 2025
 
-For the most current information, always refer to the [official Amadeus documentation](https://developers.amadeus.com/docs).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
