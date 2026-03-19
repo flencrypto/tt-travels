@@ -24,11 +24,11 @@ export function Navigation() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="glass-surface sticky top-0 z-50 border-b">
+    <header className="glass-surface sticky top-0 z-50 border-b border-border/50">
       <ClerkSetupBanner />
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary">
+          <Link to="/" className="text-2xl font-semibold text-primary tracking-tight">
             TT Travels
           </Link>
 
@@ -44,8 +44,8 @@ export function Navigation() {
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200',
                     isActive
-                      ? 'bg-accent text-accent-foreground font-medium'
-                      : 'text-foreground hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground font-medium shadow-sm shadow-primary/25'
+                      : 'text-foreground hover:bg-muted hover:text-primary'
                   )}
                 >
                   <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
@@ -127,8 +127,8 @@ export function Navigation() {
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200',
                   isActive
-                    ? 'bg-accent text-accent-foreground font-medium'
-                    : 'text-foreground hover:bg-muted'
+                    ? 'bg-primary text-primary-foreground font-medium shadow-sm shadow-primary/25'
+                    : 'text-foreground hover:bg-muted hover:text-primary'
                 )}
               >
                 <Icon size={18} weight={isActive ? 'fill' : 'regular'} />
