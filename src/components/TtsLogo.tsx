@@ -7,7 +7,7 @@
  * Props:
  *   size   – controls the height in px (width scales proportionally). Default: 48
  *   dark   – when true, uses light variant colours for dark backgrounds
- *   mono   – when true, renders in a single colour (primary) – for favicons / og-images
+ *   mono   – when true, uses a single primary colour for the "TRAVELS" text (TTs remain metallic) – for favicons / og-images
  */
 
 import { useId } from 'react'

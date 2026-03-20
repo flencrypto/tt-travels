@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, type TransitionEvent } from 'react'
+import { useEffect, useRef, useState, type TransitionEvent } from 'react'
 import { TtsLogo } from '@/components/TtsLogo'
 
 /**
@@ -22,11 +22,9 @@ type SplashScreenProps = {
 }
 
 export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
-  const [progress, setProgress] = useState(0)
   const [visible, setVisible] = useState(false)   // entrance: starts hidden, flips to visible
   const [fadeOut, setFadeOut] = useState(false)
-  const rafRef = useRef<number>(0)
-  const startRef = useRef<number>(0)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Entrance fade-in: flip to visible on first paint
   useEffect(() => {
@@ -34,24 +32,13 @@ export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const animate = useCallback((timestamp: number) => {
-    if (!startRef.current) startRef.current = timestamp
-    const elapsed = timestamp - startRef.current
-    const pct = Math.min((elapsed / duration) * 100, 100)
-    setProgress(pct)
-
-    if (pct < 100) {
-      rafRef.current = requestAnimationFrame(animate)
-    } else {
-      // Progress done → start fade-out
-      setFadeOut(true)
+  // Single timer — triggers fade-out after the progress animation completes
+  useEffect(() => {
+    timerRef.current = setTimeout(() => setFadeOut(true), duration)
+    return () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current)
     }
   }, [duration])
-
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [animate])
 
   const handleTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
     // Only trigger onDone when the root wrapper finishes its opacity fade
@@ -107,7 +94,7 @@ export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
       <div className="splash-progress-wrap" aria-hidden="true">
         <div
           className="splash-progress-bar"
-          style={{ width: `${progress}%` }}
+          style={{ animationDuration: `${duration}ms` }}
         />
       </div>
     </div>
