@@ -25,17 +25,17 @@ export default defineConfig({
       injectRegister: "auto",
       base,
       scope: base,
-      includeAssets: ["favicon-16x16.png", "favicon-32x32.png", "apple-touch-icon.png", "icons/*.png"],
+      includeAssets: ["favicon-16x16.png", "favicon-32x32.png", "apple-touch-icon.png", "icon.svg", "icons/*.png"],
       manifest: {
-        name: "TT Travels – Your Travel Companion",
-        short_name: "TT Travels",
+        name: "TTs Travels – Curated Journeys · Effortlessly Beautiful",
+        short_name: "TTs Travels",
         description: "Plan and organise your travels with AI-powered recommendations, flight search, and itinerary planning.",
         start_url: base,
         scope: base,
         display: "standalone",
         orientation: "portrait-primary",
-        background_color: "#09090b",
-        theme_color: "#6366f1",
+        background_color: "#FEFCF5",
+        theme_color: "#B76C7A",
         lang: "en",
         categories: ["travel", "lifestyle"],
         icons: [
@@ -63,7 +63,64 @@ export default defineConfig({
             url: `${base}ai-planner`,
             icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
           },
+          {
+            name: "My Trips",
+            short_name: "Trips",
+            description: "View and manage your trips",
+            url: `${base}trips`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
+          {
+            name: "Bookings",
+            short_name: "Bookings",
+            description: "View your flight and hotel bookings",
+            url: `${base}bookings`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
+          {
+            name: "Travel Journal",
+            short_name: "Journal",
+            description: "Write and read your travel journal",
+            url: `${base}journal`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
         ],
+
+        // ── Enhanced PWA capabilities ──────────────────────────────────────
+
+        // Controls how the app launches: re-use an existing window if one is
+        // open, rather than opening a duplicate tab (single-instance behaviour).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        launch_handler: { client_mode: ["navigate-existing", "auto"] } as any,
+
+        // Progressive enhancement for display: prefer window-controls-overlay
+        // (title bar canvas), fall back to standalone → minimal-ui.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        display_override: [
+          "window-controls-overlay",
+          "standalone",
+          "minimal-ui",
+        ] as any,
+
+        // Edge sidebar panel (preferred panel width in px).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        edge_side_panel: { preferred_width: 480 } as any,
+
+        // Registers the Journal page as the target for OS note-taking shortcuts.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        note_taking: { new_note_url: `${base}journal` } as any,
+
+        // Home-screen / lock-screen widget declaration.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        widgets: [
+          {
+            name: "TTs Travels",
+            tag: "tt-travels-widget",
+            description: "Quick access to your trips and destinations",
+            icons: [{ src: "icons/icon-192x192.png", sizes: "192x192" }],
+            screenshots: [],
+          },
+        ] as any,
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],

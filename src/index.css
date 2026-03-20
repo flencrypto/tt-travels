@@ -7,56 +7,95 @@
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   TTs Travels Brand Theme
+   Color Palette:
+     Blush Pink    #FDF2F8  – primary light bg / muted
+     Wisteria      #C8B5FF  – secondary / lavender accent
+     Peony         #FBE7F0  – soft secondary pink
+     Rose Gold     #E8B4AD  – accent / warm rose
+     Chrome Rose Gold #B76C7A – primary CTA / metallic rose
+     Deep Plum     #6B4C7A  – text / headings
+     Soft Ivory    #FEFCF5  – page background
+     Sage Green    #D4F0C0  – success accent
+   Typography:
+     Headings  – Space Grotesk Medium/SemiBold
+     Body      – Inter Regular
+     Accents   – Playfair Display Italic (quotes & highlights)
+───────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: oklch(0.99 0.005 106);
-  --foreground: oklch(0.20 0.015 260);
+  /* Soft Ivory #FEFCF5 */
+  --background: oklch(0.992 0.007 88);
+  /* Deep Plum #6B4C7A */
+  --foreground: oklch(0.39 0.11 308);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0.015 260);
+  /* Blush Pink-tinted card #FDF2F8 */
+  --card: oklch(0.978 0.013 355);
+  --card-foreground: oklch(0.39 0.11 308);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.015 260);
+  --popover-foreground: oklch(0.39 0.11 308);
 
-  --primary: oklch(0.55 0.22 262);
+  /* Chrome Rose Gold #B76C7A – primary CTA */
+  --primary: oklch(0.58 0.09 5);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.70 0.19 195);
+
+  /* Wisteria #C8B5FF – lavender secondary */
+  --secondary: oklch(0.78 0.12 290);
   --secondary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.96 0.005 260);
-  --muted-foreground: oklch(0.50 0.01 260);
-  --accent: oklch(0.75 0.20 40);
-  --accent-foreground: oklch(0.15 0.015 260);
+
+  /* Blush Pink #FDF2F8 – muted backgrounds */
+  --muted: oklch(0.972 0.015 355);
+  --muted-foreground: oklch(0.56 0.06 305);
+
+  /* Rose Gold #E8B4AD – accent */
+  --accent: oklch(0.80 0.06 20);
+  --accent-foreground: oklch(0.39 0.11 308);
+
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.90 0.01 260);
-  --input: oklch(0.90 0.01 260);
-  --ring: oklch(0.55 0.22 262);
+  /* Light rose border */
+  --border: oklch(0.91 0.012 350);
+  --input: oklch(0.91 0.012 350);
+  /* Chrome Rose Gold ring */
+  --ring: oklch(0.58 0.09 5);
 
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 }
 
 .dark {
-  --background: oklch(0.15 0.015 260);
-  --foreground: oklch(0.98 0.005 260);
+  /* Deep Plum dark bg */
+  --background: oklch(0.20 0.08 305);
+  /* Light blush foreground */
+  --foreground: oklch(0.95 0.012 355);
 
-  --card: oklch(0.20 0.02 260);
-  --card-foreground: oklch(0.98 0.005 260);
-  --popover: oklch(0.20 0.02 260);
-  --popover-foreground: oklch(0.98 0.005 260);
+  --card: oklch(0.25 0.09 305);
+  --card-foreground: oklch(0.95 0.012 355);
+  --popover: oklch(0.25 0.09 305);
+  --popover-foreground: oklch(0.95 0.012 355);
 
-  --primary: oklch(0.65 0.24 262);
+  /* Chrome Rose Gold lighter for dark */
+  --primary: oklch(0.68 0.09 5);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.60 0.18 195);
+
+  /* Wisteria slightly deeper */
+  --secondary: oklch(0.62 0.13 290);
   --secondary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.25 0.02 260);
-  --muted-foreground: oklch(0.65 0.01 260);
-  --accent: oklch(0.70 0.20 40);
-  --accent-foreground: oklch(0.98 0.005 260);
+
+  --muted: oklch(0.28 0.08 305);
+  --muted-foreground: oklch(0.70 0.05 355);
+
+  /* Rose Gold darker mode */
+  --accent: oklch(0.72 0.07 20);
+  --accent-foreground: oklch(0.99 0 0);
+
   --destructive: oklch(0.60 0.24 27);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.30 0.02 260);
-  --input: oklch(0.30 0.02 260);
-  --ring: oklch(0.65 0.24 262);
+  --border: oklch(0.32 0.07 305);
+  --input: oklch(0.32 0.07 305);
+  --ring: oklch(0.68 0.09 5);
 }
 
 @theme {
@@ -87,32 +126,64 @@
   --radius-2xl: calc(var(--radius) * 3);
   --radius-full: 9999px;
 
-  --font-heading: 'Playfair Display', serif;
-  --font-subheading: 'Space Grotesk', sans-serif;
+  /* Typography tokens */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-display: 'Playfair Display', serif;
   --font-body: 'Inter', sans-serif;
 }
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
 
 body {
   font-family: var(--font-body);
   line-height: 1.6;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
-h1 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-h2, h3 {
-  font-family: var(--font-subheading);
-  font-weight: 600;
+/* Playfair Display italic for quotes, taglines, and accent text */
+.font-display,
+blockquote,
+.tagline {
+  font-family: var(--font-display);
+  font-style: italic;
 }
+
+/* ── Brand Gradients ─────────────────────────────────────────────────────── */
+
+/* Chrome Rose Gold → Wisteria */
+.brand-gradient {
+  background: linear-gradient(135deg,
+    oklch(0.58 0.09 5) 0%,
+    oklch(0.78 0.12 290) 100%
+  );
+}
+
+/* Subtle blush hero background */
+.hero-gradient {
+  background: linear-gradient(160deg,
+    oklch(0.978 0.013 355) 0%,
+    oklch(0.992 0.007 88) 40%,
+    oklch(0.96 0.025 290) 100%
+  );
+}
+
+/* ── Glass Morphism ──────────────────────────────────────────────────────── */
 
 .glass-surface {
-  backdrop-filter: blur(12px);
-  background: oklch(from var(--card) l c h / 0.8);
-  border: 1px solid oklch(from var(--border) l c h / 0.5);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: oklch(from var(--card) l c h / 0.82);
+  border: 1px solid oklch(from var(--border) l c h / 0.60);
 }
+
+/* ── Component Utilities ─────────────────────────────────────────────────── */
 
 .destination-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -133,4 +204,229 @@ h2, h3 {
 @keyframes heartBounce {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.2); }
+}
+
+/* ── Floral / Brand decorative pattern overlay ───────────────────────────── */
+
+.floral-bg {
+  background-image:
+    radial-gradient(circle at 10% 10%, oklch(0.80 0.06 20 / 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 90% 5%, oklch(0.78 0.12 290 / 0.15) 0%, transparent 35%),
+    radial-gradient(circle at 80% 90%, oklch(0.58 0.09 5 / 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 5% 90%, oklch(0.78 0.12 290 / 0.12) 0%, transparent 35%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Splash / Startup Screen
+   Mirrors the brand bokeh background: soft pink → warm cream → golden-pink,
+   with animated floating bokeh orbs and a rose-gold progress bar.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Root container – fixed, full-screen, sits above everything */
+.splash-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* entrance fade-in handled by React inline style starting at opacity 0 */
+}
+
+/* Layered radial gradient matching the bokeh background image */
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 75% 45% at 50% 0%,   #F8CED8 0%, transparent 55%),
+    radial-gradient(ellipse 90% 55% at 15% 105%,  #F4C4D4 0%, #F0B8C8 35%, transparent 60%),
+    radial-gradient(ellipse 80% 45% at 85% 105%,  #F8C4A8 0%, #F4BCA0 30%, transparent 55%),
+    linear-gradient(175deg,
+      #F2C0D0 0%,
+      #FDE6EC 18%,
+      #FEF3EE 38%,
+      #FEEDE4 58%,
+      #FAD4C4 78%,
+      #F4BCBC 100%
+    );
+}
+
+/* Bokeh orbs layer */
+.splash-bokeh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Shared bokeh orb style */
+.bokeh-orb {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* ── Large warm-gold cluster (lower half) ── */
+.orb-1 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,232,160,0.60) 0%, transparent 70%);
+  left: 4%; top: 60%;
+  filter: blur(28px);
+  animation: bokehFloat1 7s ease-in-out infinite;
+}
+.orb-2 {
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(255,238,180,0.65) 0%, transparent 70%);
+  left: 20%; top: 68%;
+  filter: blur(22px);
+  animation: bokehFloat2 9s ease-in-out infinite 1.2s;
+}
+.orb-3 {
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(255,244,200,0.55) 0%, transparent 70%);
+  left: 36%; top: 74%;
+  filter: blur(18px);
+  animation: bokehFloat1 8s ease-in-out infinite 0.5s;
+}
+.orb-4 {
+  width: 145px; height: 145px;
+  background: radial-gradient(circle, rgba(255,228,155,0.50) 0%, transparent 70%);
+  left: 52%; top: 63%;
+  filter: blur(26px);
+  animation: bokehFloat3 10s ease-in-out infinite 2s;
+}
+.orb-5 {
+  width: 125px; height: 125px;
+  background: radial-gradient(circle, rgba(255,234,172,0.58) 0%, transparent 70%);
+  left: 68%; top: 70%;
+  filter: blur(22px);
+  animation: bokehFloat2 8.5s ease-in-out infinite 0.8s;
+}
+.orb-6 {
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(255,240,192,0.55) 0%, transparent 70%);
+  left: 83%; top: 61%;
+  filter: blur(20px);
+  animation: bokehFloat3 7.5s ease-in-out infinite 1.8s;
+}
+
+/* ── Small accent orbs ── */
+.orb-sm-1 {
+  width: 55px; height: 55px;
+  background: radial-gradient(circle, rgba(255,244,215,0.80) 0%, transparent 70%);
+  left: 13%; top: 79%;
+  filter: blur(12px);
+  animation: bokehFloat1 6s ease-in-out infinite 0.3s;
+}
+.orb-sm-2 {
+  width: 45px; height: 45px;
+  background: radial-gradient(circle, rgba(255,248,222,0.75) 0%, transparent 70%);
+  left: 47%; top: 82%;
+  filter: blur(10px);
+  animation: bokehFloat2 7s ease-in-out infinite 1.5s;
+}
+.orb-sm-3 {
+  width: 50px; height: 50px;
+  background: radial-gradient(circle, rgba(255,244,210,0.70) 0%, transparent 70%);
+  left: 74%; top: 78%;
+  filter: blur(12px);
+  animation: bokehFloat3 6.5s ease-in-out infinite 0.9s;
+}
+
+/* ── Soft pink upper-corner halos ── */
+.orb-pk-1 {
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(248,198,218,0.28) 0%, transparent 65%);
+  left: -8%; top: 2%;
+  filter: blur(45px);
+  animation: bokehFloat1 12s ease-in-out infinite;
+}
+.orb-pk-2 {
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(248,192,212,0.22) 0%, transparent 65%);
+  left: 72%; top: 0%;
+  filter: blur(40px);
+  animation: bokehFloat2 14s ease-in-out infinite 3s;
+}
+
+/* Subtle shimmer that drifts across the centre */
+@keyframes bokehFloat1 {
+  0%, 100% { transform: translate(0,    0   ) scale(1.00); opacity: 1;    }
+  33%       { transform: translate(8px,  -14px) scale(1.04); opacity: 0.88; }
+  66%       { transform: translate(-6px, -8px ) scale(0.97); opacity: 0.95; }
+}
+@keyframes bokehFloat2 {
+  0%, 100% { transform: translate(0,    0   ) scale(1.00); opacity: 1;    }
+  40%       { transform: translate(-10px,-12px) scale(1.05); opacity: 0.85; }
+  70%       { transform: translate(7px,  -6px ) scale(0.96); opacity: 0.92; }
+}
+@keyframes bokehFloat3 {
+  0%, 100% { transform: translate(0,   0    ) scale(1.00); opacity: 1;    }
+  30%       { transform: translate(6px, -10px) scale(1.03); opacity: 0.90; }
+  60%       { transform: translate(-8px,-16px) scale(1.06); opacity: 0.82; }
+}
+
+/* ── Logo container ── */
+.splash-logo {
+  position: relative;
+  z-index: 2;
+  animation: logoReveal 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes logoReveal {
+  from { opacity: 0; transform: scale(0.82) translateY(16px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* ── Progress bar ── */
+.splash-progress-wrap {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(280px, 68vw);
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(183, 108, 122, 0.20);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.splash-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg,
+    #D4967A 0%,
+    #B76C7A 50%,
+    #C97C7C 100%
+  );
+  box-shadow: 0 0 8px rgba(183, 108, 122, 0.55);
+  /* CSS animation — duration is set via animationDuration inline style from the component */
+  animation: splashProgress linear forwards;
+  /* Shimmer sweep */
+  position: relative;
+  overflow: hidden;
+}
+
+.splash-progress-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.4s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes progressShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes splashProgress {
+  from { width: 0%; }
+  to   { width: 100%; }
 }

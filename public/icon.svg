@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Main background gradient: soft blush pink -->
+    <radialGradient id="bgGrad" cx="40%" cy="35%" r="75%">
+      <stop offset="0%"  stop-color="#FDEEF4"/>
+      <stop offset="50%" stop-color="#F9D8E8"/>
+      <stop offset="100%" stop-color="#F0B8D0"/>
+    </radialGradient>
+    <!-- Rose-gold metallic gradient for TTs letters -->
+    <linearGradient id="roGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#E8B89A"/>
+      <stop offset="30%"  stop-color="#C97C7C"/>
+      <stop offset="65%"  stop-color="#B06070"/>
+      <stop offset="100%" stop-color="#8C4A5A"/>
+    </linearGradient>
+    <!-- Clip for rounded-square shape -->
+    <clipPath id="roundRect">
+      <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230"/>
+    </clipPath>
+    <!-- Petal gradient for flowers -->
+    <radialGradient id="petalPink" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#F4B8D4"/>
+      <stop offset="100%" stop-color="#E090B8"/>
+    </radialGradient>
+    <radialGradient id="petalLav" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#D8B4F0"/>
+      <stop offset="100%" stop-color="#C090D8"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded square clipping mask applied to everything -->
+  <g clip-path="url(#roundRect)">
+
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+
+    <!-- Subtle light shimmer overlay -->
+    <ellipse cx="380" cy="280" rx="320" ry="240" fill="white" opacity="0.18"/>
+    <ellipse cx="620" cy="200" rx="200" ry="140" fill="white" opacity="0.10"/>
+
+    <!-- ── FLOWERS: bottom-left cluster ── -->
+    <!-- Large chrysanthemum center 1 (purple/lavender) -->
+    <g transform="translate(190,780)">
+      <!-- petals ring 1 -->
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(30)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(90)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(150)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(210)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(270)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(300)"/>
+      <ellipse cx="0" cy="-62" rx="14" ry="32" fill="url(#petalLav)" transform="rotate(330)"/>
+      <!-- petals ring 2 (inner, rotated 15deg) -->
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(15)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(45)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(75)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(105)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(135)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(165)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(195)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(225)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(255)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(285)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(315)"/>
+      <ellipse cx="0" cy="-42" rx="10" ry="22" fill="#E0A8F0" transform="rotate(345)"/>
+      <!-- Centre -->
+      <circle cx="0" cy="0" r="22" fill="#F0C0E0"/>
+      <circle cx="0" cy="0" r="12" fill="#E8A0D0"/>
+    </g>
+
+    <!-- Pink chrysanthemum (larger, front) -->
+    <g transform="translate(310,850)">
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(25)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(50)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(75)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(100)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(125)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(150)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(175)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(200)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(225)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(250)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(275)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(300)"/>
+      <ellipse cx="0" cy="-70" rx="15" ry="35" fill="url(#petalPink)" transform="rotate(325)"/>
+      <!-- inner ring -->
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(12)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(37)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(62)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(87)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(112)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(137)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(162)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(187)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(212)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(237)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(262)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(287)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(312)"/>
+      <ellipse cx="0" cy="-48" rx="11" ry="24" fill="#F8C8DC" transform="rotate(337)"/>
+      <!-- centre -->
+      <circle cx="0" cy="0" r="24" fill="#F4B0C8"/>
+      <circle cx="0" cy="0" r="13" fill="#EE98B8"/>
+    </g>
+
+    <!-- Small bud / leaf shapes bottom left -->
+    <ellipse cx="120" cy="890" rx="22" ry="40" fill="#D8F0C0" transform="rotate(-30,120,890)" opacity="0.8"/>
+    <ellipse cx="88" cy="920" rx="16" ry="30" fill="#C8E8B0" transform="rotate(-50,88,920)" opacity="0.7"/>
+    <ellipse cx="155" cy="930" rx="18" ry="28" fill="#D0ECC0" transform="rotate(20,155,930)" opacity="0.75"/>
+    <ellipse cx="240" cy="920" rx="14" ry="24" fill="#D8F0C0" transform="rotate(-10,240,920)" opacity="0.7"/>
+
+    <!-- Small top-right flower bud -->
+    <g transform="translate(840,200) scale(0.55)">
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-50" rx="12" ry="28" fill="#F8D0E4" transform="rotate(300)"/>
+      <circle cx="0" cy="0" r="18" fill="#F4B8CC"/>
+    </g>
+
+    <!-- ── HUMMINGBIRD / TINY BIRD upper right ── -->
+    <!-- Body -->
+    <ellipse cx="720" cy="230" rx="28" ry="14" fill="#C97C7C" transform="rotate(-20,720,230)"/>
+    <!-- Wing -->
+    <ellipse cx="712" cy="222" rx="22" ry="9" fill="#D4967A" opacity="0.8" transform="rotate(-35,712,222)"/>
+    <!-- Head -->
+    <circle cx="742" cy="222" r="11" fill="#B76C7A"/>
+    <!-- Beak -->
+    <line x1="753" y1="220" x2="778" y2="215" stroke="#C97C7C" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Tail -->
+    <path d="M695 238 Q680 250 668 242 Q676 232 695 238Z" fill="#B76C7A" opacity="0.85"/>
+
+    <!-- ── SPARKLES ── -->
+    <!-- Large 4-point star, upper right -->
+    <g fill="#D4967A" opacity="0.90">
+      <path d="M800 130 L806 150 L826 144 L806 158 L800 178 L794 158 L774 144 L794 150 Z"/>
+    </g>
+    <!-- Medium star -->
+    <g fill="#E8B49A" opacity="0.80">
+      <path d="M870 180 L874 192 L886 188 L874 198 L870 210 L866 198 L854 188 L866 192 Z"/>
+    </g>
+    <!-- Small dot stars -->
+    <circle cx="760" cy="155" r="5" fill="#E8C0A0" opacity="0.75"/>
+    <circle cx="830" cy="260" r="3.5" fill="#D4967A" opacity="0.65"/>
+    <circle cx="880" cy="130" r="4" fill="#E8B49A" opacity="0.70"/>
+    <circle cx="755" cy="200" r="3" fill="#F0C8B0" opacity="0.60"/>
+
+    <!-- Soft glow / light leak top right -->
+    <ellipse cx="820" cy="160" rx="180" ry="120" fill="white" opacity="0.08"/>
+
+    <!-- ── "TTs" LETTERING ── -->
+    <!-- Using SVG text with the rose-gold gradient fill -->
+    <!-- First T -->
+    <rect x="148" y="200" width="218" height="26" rx="6" fill="url(#roGold)"/>
+    <rect x="242" y="200" width="26" height="198" rx="6" fill="url(#roGold)"/>
+    <!-- Second T -->
+    <rect x="390" y="200" width="218" height="26" rx="6" fill="url(#roGold)"/>
+    <rect x="484" y="200" width="26" height="198" rx="6" fill="url(#roGold)"/>
+    <!-- small "s" -->
+    <path d="M636 330 Q636 306 650 296 Q668 284 692 288 Q712 292 718 308 Q724 324 712 334 Q694 342 670 346 Q648 352 644 368 Q640 386 652 396 Q666 406 694 406 Q718 406 730 394 Q737 384 733 374"
+          stroke="url(#roGold)" stroke-width="22" stroke-linecap="round" fill="none"/>
+
+  </g>
+
+  <!-- White border / outer ring (subtle) -->
+  <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230"
+        fill="none" stroke="white" stroke-width="12" opacity="0.40"/>
+</svg>
