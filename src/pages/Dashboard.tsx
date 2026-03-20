@@ -147,10 +147,10 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {SHOWCASE_DESTINATIONS.map((idx, position) => {
+          {SHOWCASE_DESTINATIONS.map((idx, showcaseIndex) => {
             const dest = destinations[idx]
             if (!dest) return null
-            const isLarge = position === 0
+            const isLarge = showcaseIndex === 0
             return (
               <Link
                 key={dest.id}
