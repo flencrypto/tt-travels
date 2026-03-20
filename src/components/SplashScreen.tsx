@@ -87,29 +87,9 @@ export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
         <div className="bokeh-orb orb-pk-2" />
       </div>
 
-      {/* ── Sparkle stars ─────────────────────────────────────────────── */}
-      <div className="splash-sparkles" aria-hidden="true">
-        <svg className="sparkle sparkle-1" viewBox="0 0 40 40" fill="none">
-          <path d="M20 2 L22 18 L38 20 L22 22 L20 38 L18 22 L2 20 L18 18 Z"
-                fill="#D4967A" opacity="0.9"/>
-        </svg>
-        <svg className="sparkle sparkle-2" viewBox="0 0 28 28" fill="none">
-          <path d="M14 1 L15.5 12.5 L27 14 L15.5 15.5 L14 27 L12.5 15.5 L1 14 L12.5 12.5 Z"
-                fill="#E8B49A" opacity="0.85"/>
-        </svg>
-        <svg className="sparkle sparkle-3" viewBox="0 0 20 20" fill="none">
-          <path d="M10 1 L11 9 L19 10 L11 11 L10 19 L9 11 L1 10 L9 9 Z"
-                fill="#D4967A" opacity="0.75"/>
-        </svg>
-        <svg className="sparkle sparkle-4" viewBox="0 0 16 16" fill="none">
-          <path d="M8 1 L8.8 7.2 L15 8 L8.8 8.8 L8 15 L7.2 8.8 L1 8 L7.2 7.2 Z"
-                fill="#E8C0A0" opacity="0.70"/>
-        </svg>
-      </div>
-
       {/* ── Logo ──────────────────────────────────────────────────────── */}
       <div className="splash-logo">
-        <TtsLogo size={96} dark />
+        <TtsLogo size={140} dark />
       </div>
 
       {/* ── Progress bar ──────────────────────────────────────────────── */}

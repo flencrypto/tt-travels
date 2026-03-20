@@ -67,11 +67,17 @@ export function TtsLogo({ size = 48, dark = false, mono = false, className = '' 
       <rect x="273" y="12" width="20"  height="148" rx="4" fill="url(#ttsMetal)" />
 
       {/* ── "s" (small, italic serif feel) ─────────────────────────────── */}
-      {/* Rendered as a path approximating a lowercase serif "s" */}
+      {/*
+        Two cubic-bezier arcs that form a correct lowercase 's':
+        – Upper bowl: starts right (x≈462), arcs UP+LEFT over the top, descends
+          to the left side (x≈388) at the midpoint. The concave face opens RIGHT.
+        – Lower bowl: continues straight down from the left side, dips BELOW the
+          end-point (creating the visible bottom curve), then rises to the right
+          side (x≈460). The concave face opens LEFT.
+        Both arcs share a vertical tangent at the midpoint for a smooth join.
+      */}
       <path
-        d="M388 110 Q388 94 400 88 Q416 82 436 85 Q452 88 456 98 Q460 110 450 116
-           Q436 122 416 124 Q398 128 394 140 Q390 154 400 162 Q412 170 436 170
-           Q456 170 466 160 Q472 152 468 144"
+        d="M462 90 C464 68,388 62,388 110 C388 152,466 174,460 168"
         stroke="url(#ttsMetalS)"
         strokeWidth="16"
         strokeLinecap="round"

@@ -63,7 +63,86 @@ export default defineConfig({
             url: `${base}ai-planner`,
             icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
           },
+          {
+            name: "My Trips",
+            short_name: "Trips",
+            description: "View and manage your trips",
+            url: `${base}trips`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
+          {
+            name: "Bookings",
+            short_name: "Bookings",
+            description: "View your flight and hotel bookings",
+            url: `${base}bookings`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
+          {
+            name: "Travel Journal",
+            short_name: "Journal",
+            description: "Write and read your travel journal",
+            url: `${base}journal`,
+            icons: [{ src: "icons/icon-96x96.png", sizes: "96x96" }],
+          },
         ],
+
+        // ── Enhanced PWA capabilities ──────────────────────────────────────
+
+        // Controls how the app launches: re-use an existing window if one is
+        // open, rather than opening a duplicate tab (single-instance behaviour).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        launch_handler: { client_mode: ["navigate-existing", "auto"] } as any,
+
+        // Allows other apps / the OS share sheet to send content to TTs Travels.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        share_target: {
+          action: base,
+          method: "GET",
+          params: { title: "title", text: "text", url: "url" },
+        } as any,
+
+        // Registers a custom URL protocol so deep-links like
+        // web+ttstravels://destination/paris open the app directly.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        protocol_handlers: [
+          { protocol: "web+ttstravels", url: `${base}?url=%s` },
+        ] as any,
+
+        // Allows the app to be the default handler for plain-text travel files
+        // (e.g. exported itineraries).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        file_handlers: [
+          { action: base, accept: { "text/plain": [".txt"] } },
+        ] as any,
+
+        // Progressive enhancement for display: prefer window-controls-overlay
+        // (title bar canvas), fall back to standalone → minimal-ui.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        display_override: [
+          "window-controls-overlay",
+          "standalone",
+          "minimal-ui",
+        ] as any,
+
+        // Edge sidebar panel (preferred panel width in px).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        edge_side_panel: { preferred_width: 480 } as any,
+
+        // Registers the Journal page as the target for OS note-taking shortcuts.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        note_taking: { new_note_url: `${base}journal` } as any,
+
+        // Home-screen / lock-screen widget declaration.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        widgets: [
+          {
+            name: "TTs Travels",
+            tag: "tt-travels-widget",
+            description: "Quick access to your trips and destinations",
+            icons: [{ src: "icons/icon-192x192.png", sizes: "192x192" }],
+            screenshots: [],
+          },
+        ] as any,
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
