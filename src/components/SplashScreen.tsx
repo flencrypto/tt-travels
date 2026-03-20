@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, type TransitionEvent } from 'react'
 import { TtsLogo } from '@/components/TtsLogo'
 
 /**
@@ -53,7 +53,7 @@ export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [animate])
 
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+  const handleTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
     // Only trigger onDone when the root wrapper finishes its opacity fade
     if (e.propertyName === 'opacity' && fadeOut) {
       onDone()

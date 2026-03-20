@@ -169,7 +169,7 @@ export function Landing() {
               </p>
               
               <p className="mb-8 text-lg text-muted-foreground">
-                TT Travels combines cutting-edge AI with real-time travel data to help you plan 
+                TTs Travels combines cutting-edge AI with real-time travel data to help you plan 
                 the perfect trip. Whether you're exploring new destinations or booking your next 
                 flight, we've got you covered.
               </p>
