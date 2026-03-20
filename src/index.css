@@ -215,3 +215,237 @@ blockquote,
     radial-gradient(circle at 80% 90%, oklch(0.58 0.09 5 / 0.12) 0%, transparent 40%),
     radial-gradient(circle at 5% 90%, oklch(0.78 0.12 290 / 0.12) 0%, transparent 35%);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Splash / Startup Screen
+   Mirrors the brand bokeh background: soft pink → warm cream → golden-pink,
+   with animated floating bokeh orbs and a rose-gold progress bar.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Root container – fixed, full-screen, sits above everything */
+.splash-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* entrance fade-in handled by React inline style starting at opacity 0 */
+}
+
+/* Layered radial gradient matching the bokeh background image */
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 75% 45% at 50% 0%,   #F8CED8 0%, transparent 55%),
+    radial-gradient(ellipse 90% 55% at 15% 105%,  #F4C4D4 0%, #F0B8C8 35%, transparent 60%),
+    radial-gradient(ellipse 80% 45% at 85% 105%,  #F8C4A8 0%, #F4BCA0 30%, transparent 55%),
+    linear-gradient(175deg,
+      #F2C0D0 0%,
+      #FDE6EC 18%,
+      #FEF3EE 38%,
+      #FEEDE4 58%,
+      #FAD4C4 78%,
+      #F4BCBC 100%
+    );
+}
+
+/* Bokeh orbs layer */
+.splash-bokeh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Shared bokeh orb style */
+.bokeh-orb {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* ── Large warm-gold cluster (lower half) ── */
+.orb-1 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,232,160,0.60) 0%, transparent 70%);
+  left: 4%; top: 60%;
+  filter: blur(28px);
+  animation: bokehFloat1 7s ease-in-out infinite;
+}
+.orb-2 {
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(255,238,180,0.65) 0%, transparent 70%);
+  left: 20%; top: 68%;
+  filter: blur(22px);
+  animation: bokehFloat2 9s ease-in-out infinite 1.2s;
+}
+.orb-3 {
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(255,244,200,0.55) 0%, transparent 70%);
+  left: 36%; top: 74%;
+  filter: blur(18px);
+  animation: bokehFloat1 8s ease-in-out infinite 0.5s;
+}
+.orb-4 {
+  width: 145px; height: 145px;
+  background: radial-gradient(circle, rgba(255,228,155,0.50) 0%, transparent 70%);
+  left: 52%; top: 63%;
+  filter: blur(26px);
+  animation: bokehFloat3 10s ease-in-out infinite 2s;
+}
+.orb-5 {
+  width: 125px; height: 125px;
+  background: radial-gradient(circle, rgba(255,234,172,0.58) 0%, transparent 70%);
+  left: 68%; top: 70%;
+  filter: blur(22px);
+  animation: bokehFloat2 8.5s ease-in-out infinite 0.8s;
+}
+.orb-6 {
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(255,240,192,0.55) 0%, transparent 70%);
+  left: 83%; top: 61%;
+  filter: blur(20px);
+  animation: bokehFloat3 7.5s ease-in-out infinite 1.8s;
+}
+
+/* ── Small accent orbs ── */
+.orb-sm-1 {
+  width: 55px; height: 55px;
+  background: radial-gradient(circle, rgba(255,244,215,0.80) 0%, transparent 70%);
+  left: 13%; top: 79%;
+  filter: blur(12px);
+  animation: bokehFloat1 6s ease-in-out infinite 0.3s;
+}
+.orb-sm-2 {
+  width: 45px; height: 45px;
+  background: radial-gradient(circle, rgba(255,248,222,0.75) 0%, transparent 70%);
+  left: 47%; top: 82%;
+  filter: blur(10px);
+  animation: bokehFloat2 7s ease-in-out infinite 1.5s;
+}
+.orb-sm-3 {
+  width: 50px; height: 50px;
+  background: radial-gradient(circle, rgba(255,244,210,0.70) 0%, transparent 70%);
+  left: 74%; top: 78%;
+  filter: blur(12px);
+  animation: bokehFloat3 6.5s ease-in-out infinite 0.9s;
+}
+
+/* ── Soft pink upper-corner halos ── */
+.orb-pk-1 {
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(248,198,218,0.28) 0%, transparent 65%);
+  left: -8%; top: 2%;
+  filter: blur(45px);
+  animation: bokehFloat1 12s ease-in-out infinite;
+}
+.orb-pk-2 {
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(248,192,212,0.22) 0%, transparent 65%);
+  left: 72%; top: 0%;
+  filter: blur(40px);
+  animation: bokehFloat2 14s ease-in-out infinite 3s;
+}
+
+/* Subtle shimmer that drifts across the centre */
+@keyframes bokehFloat1 {
+  0%, 100% { transform: translate(0,    0   ) scale(1.00); opacity: 1;    }
+  33%       { transform: translate(8px,  -14px) scale(1.04); opacity: 0.88; }
+  66%       { transform: translate(-6px, -8px ) scale(0.97); opacity: 0.95; }
+}
+@keyframes bokehFloat2 {
+  0%, 100% { transform: translate(0,    0   ) scale(1.00); opacity: 1;    }
+  40%       { transform: translate(-10px,-12px) scale(1.05); opacity: 0.85; }
+  70%       { transform: translate(7px,  -6px ) scale(0.96); opacity: 0.92; }
+}
+@keyframes bokehFloat3 {
+  0%, 100% { transform: translate(0,   0    ) scale(1.00); opacity: 1;    }
+  30%       { transform: translate(6px, -10px) scale(1.03); opacity: 0.90; }
+  60%       { transform: translate(-8px,-16px) scale(1.06); opacity: 0.82; }
+}
+
+/* ── Sparkle stars layer ── */
+.splash-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  animation: sparklePulse 3s ease-in-out infinite;
+}
+
+/* Positions matching the reference image (large star top-right of logo) */
+.sparkle-1 { width: 48px; height: 48px; right: 22%; top: 30%; animation-delay: 0s; }
+.sparkle-2 { width: 32px; height: 32px; right: 16%; top: 25%; animation-delay: 0.6s; }
+.sparkle-3 { width: 22px; height: 22px; right: 28%; top: 23%; animation-delay: 1.2s; }
+.sparkle-4 { width: 18px; height: 18px; right: 19%; top: 37%; animation-delay: 1.8s; }
+
+@keyframes sparklePulse {
+  0%, 100% { transform: scale(1)    rotate(0deg);   opacity: 0.80; }
+  25%       { transform: scale(1.25) rotate(15deg);  opacity: 1;    }
+  50%       { transform: scale(0.85) rotate(-10deg); opacity: 0.60; }
+  75%       { transform: scale(1.15) rotate(8deg);   opacity: 0.95; }
+}
+
+/* ── Logo container ── */
+.splash-logo {
+  position: relative;
+  z-index: 2;
+  animation: logoReveal 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes logoReveal {
+  from { opacity: 0; transform: scale(0.82) translateY(16px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* ── Progress bar ── */
+.splash-progress-wrap {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(280px, 68vw);
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(183, 108, 122, 0.20);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.splash-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg,
+    #D4967A 0%,
+    #B76C7A 50%,
+    #C97C7C 100%
+  );
+  box-shadow: 0 0 8px rgba(183, 108, 122, 0.55);
+  transition: width 0.12s linear;
+  /* Shimmer sweep */
+  position: relative;
+  overflow: hidden;
+}
+
+.splash-progress-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.4s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes progressShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/react'
 import { Toaster } from './components/ui/sonner'
 import { Navigation } from './components/Navigation'
+import { SplashScreen } from './components/SplashScreen'
 import { Dashboard } from './pages/Dashboard'
 import { Explore } from './pages/Explore'
 import { AIPlanner } from './pages/AIPlanner'
@@ -31,31 +33,38 @@ export type FavoriteDestination = Destination & {
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_placeholder'
 
 function App() {
+  const [splashDone, setSplashDone] = useState(false)
+
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/+$/, '') || undefined}>
-        <div className="min-h-screen bg-background">
-          <Navigation />
-          <main>
-            <div className="container mx-auto px-4 py-6">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/setup" element={<Setup />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/ai-planner" element={<AIPlanner />} />
-                <Route path="/route-planner" element={<RoutePlanner />} />
-                <Route path="/bookings" element={<Bookings />} />
-                <Route path="/trips" element={<Trips />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/journal" element={<Journal />} />
-                <Route path="/settings" element={<Settings />} />
-              </Routes>
-            </div>
-          </main>
-        </div>
-        <Toaster />
-      </BrowserRouter>
-    </ClerkProvider>
+    <>
+      {!splashDone && (
+        <SplashScreen onDone={() => setSplashDone(true)} />
+      )}
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/+$/, '') || undefined}>
+          <div className="min-h-screen bg-background">
+            <Navigation />
+            <main>
+              <div className="container mx-auto px-4 py-6">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/setup" element={<Setup />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/ai-planner" element={<AIPlanner />} />
+                  <Route path="/route-planner" element={<RoutePlanner />} />
+                  <Route path="/bookings" element={<Bookings />} />
+                  <Route path="/trips" element={<Trips />} />
+                  <Route path="/favorites" element={<Favorites />} />
+                  <Route path="/journal" element={<Journal />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Routes>
+              </div>
+            </main>
+          </div>
+          <Toaster />
+        </BrowserRouter>
+      </ClerkProvider>
+    </>
   )
 }
 
