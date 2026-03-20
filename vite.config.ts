@@ -25,10 +25,10 @@ export default defineConfig({
       injectRegister: "auto",
       base,
       scope: base,
-      includeAssets: ["favicon-16x16.png", "favicon-32x32.png", "apple-touch-icon.png", "icons/*.png"],
+      includeAssets: ["favicon-16x16.png", "favicon-32x32.png", "apple-touch-icon.png", "icon.svg", "icons/*.png"],
       manifest: {
-        name: "TT Travels – Your Travel Companion",
-        short_name: "TT Travels",
+        name: "TTs Travels – Curated Journeys · Effortlessly Beautiful",
+        short_name: "TTs Travels",
         description: "Plan and organise your travels with AI-powered recommendations, flight search, and itinerary planning.",
         start_url: base,
         scope: base,

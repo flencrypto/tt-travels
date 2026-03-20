@@ -3,6 +3,7 @@ import { SignInButton, SignUpButton } from '@clerk/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ClerkSetupBanner } from '@/components/ClerkSetupBanner'
+import { TtsLogo } from '@/components/TtsLogo'
 import { 
   Sparkle, 
   MapPin, 
@@ -72,6 +73,11 @@ export function Landing() {
         
         <div className="container relative mx-auto px-6 py-8 md:py-20">
           <div className="mx-auto max-w-4xl text-center">
+            {/* Brand logo mark in hero */}
+            <div className="mb-6 flex justify-center">
+              <TtsLogo size={72} />
+            </div>
+
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary border border-primary/20">
               <Sparkle size={16} weight="fill" />
               AI-Powered Travel Platform
@@ -284,8 +290,8 @@ export function Landing() {
         <div className="container mx-auto px-6">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
-              <Link to="/" className="mb-2 block text-2xl font-semibold text-primary">
-                TT Travels
+              <Link to="/" className="mb-3 block" aria-label="TTs Travels home">
+                <TtsLogo size={40} />
               </Link>
               <p className="tagline mb-3 text-sm text-muted-foreground">
                 Curated Journeys · Effortlessly Beautiful
