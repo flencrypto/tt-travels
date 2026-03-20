@@ -66,7 +66,7 @@ export function Landing() {
   return (
     <div className="min-h-screen">
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden hero-gradient floral-bg">
+      <section className="relative overflow-hidden hero-gradient">
         <div className="container relative mx-auto px-6 py-12">
           <ClerkSetupBanner />
         </div>
@@ -266,7 +266,7 @@ export function Landing() {
             Curated journeys · Effortlessly beautiful
           </p>
           <p className="mb-8 text-xl text-muted-foreground">
-            Join thousands of travelers who plan smarter with TT Travels
+            Join thousands of travelers who plan smarter with TTs Travels
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <SignUpButton mode="modal">
@@ -334,7 +334,7 @@ export function Landing() {
           </div>
           
           <div className="mt-12 border-t border-border/50 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} TT Travels. Built with AI-powered technology.</p>
+            <p>&copy; {new Date().getFullYear()} TTs Travels. Built with AI-powered technology.</p>
           </div>
         </div>
       </footer>

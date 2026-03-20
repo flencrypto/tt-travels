@@ -10,6 +10,8 @@
  *   mono   – when true, renders in a single colour (primary) – for favicons / og-images
  */
 
+import { useId } from 'react'
+
 type TtsLogoProps = {
   size?: number
   dark?: boolean
@@ -25,11 +27,16 @@ export function TtsLogo({ size = 48, dark = false, mono = false, className = '' 
   const w = Math.round(size * ASPECT_RATIO)
   const h = size
 
-  // Colour tokens matching the brand palette
-  const goldStart = mono ? 'oklch(58% .09 5)' : '#D4967A'  // warm rose gold highlight
-  const goldMid   = mono ? 'oklch(52% .09 5)' : '#B76C7A'  // chrome rose gold
-  const goldEnd   = mono ? 'oklch(44% .08 5)' : '#8C4A56'  // deep rose gold shadow
-  const textColor = dark || mono ? (mono ? 'oklch(58% .09 5)' : '#F5E8E3') : '#6B4C7A' // deep plum
+  // Colour tokens matching the brand palette — hex values only for full SVG/browser support
+  const goldStart = '#D4967A'  // warm rose gold highlight
+  const goldMid   = '#B76C7A'  // chrome rose gold
+  const goldEnd   = '#8C4A56'  // deep rose gold shadow
+  const textColor = dark || mono ? (mono ? '#D4967A' : '#F5E8E3') : '#6B4C7A' // deep plum / mono primary
+
+  // Unique ID prefix for this instance to avoid gradient ID collisions in the DOM
+  const uid = useId().replace(/:/g, '')
+  const gradId  = `ttsMetal-${uid}`
+  const gradSId = `ttsMetalS-${uid}`
 
   return (
     <svg
@@ -43,13 +50,13 @@ export function TtsLogo({ size = 48, dark = false, mono = false, className = '' 
     >
       <defs>
         {/* Metallic rose-gold gradient for the letterforms */}
-        <linearGradient id="ttsMetal" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={goldStart} />
           <stop offset="40%"  stopColor={goldMid} />
           <stop offset="100%" stopColor={goldEnd} />
         </linearGradient>
         {/* Slightly lighter version for the small "s" */}
-        <linearGradient id="ttsMetalS" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradSId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={goldStart} />
           <stop offset="60%"  stopColor={goldMid} />
           <stop offset="100%" stopColor={goldEnd} />
@@ -58,13 +65,13 @@ export function TtsLogo({ size = 48, dark = false, mono = false, className = '' 
 
       {/* ── "T" (first) ─────────────────────────────────────────────────── */}
       {/* Horizontal crossbar */}
-      <rect x="8"   y="12" width="174" height="18" rx="4" fill="url(#ttsMetal)" />
+      <rect x="8"   y="12" width="174" height="18" rx="4" fill={`url(#${gradId})`} />
       {/* Vertical stem */}
-      <rect x="81"  y="12" width="20"  height="148" rx="4" fill="url(#ttsMetal)" />
+      <rect x="81"  y="12" width="20"  height="148" rx="4" fill={`url(#${gradId})`} />
 
       {/* ── "T" (second) ────────────────────────────────────────────────── */}
-      <rect x="200" y="12" width="174" height="18" rx="4" fill="url(#ttsMetal)" />
-      <rect x="273" y="12" width="20"  height="148" rx="4" fill="url(#ttsMetal)" />
+      <rect x="200" y="12" width="174" height="18" rx="4" fill={`url(#${gradId})`} />
+      <rect x="273" y="12" width="20"  height="148" rx="4" fill={`url(#${gradId})`} />
 
       {/* ── "s" (small, italic serif feel) ─────────────────────────────── */}
       {/*
@@ -78,7 +85,7 @@ export function TtsLogo({ size = 48, dark = false, mono = false, className = '' 
       */}
       <path
         d="M462 90 C464 68,388 62,388 110 C388 152,466 174,460 168"
-        stroke="url(#ttsMetalS)"
+        stroke={`url(#${gradSId})`}
         strokeWidth="16"
         strokeLinecap="round"
         fill="none"

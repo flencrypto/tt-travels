@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { TtsLogo } from '@/components/TtsLogo'
 
 /**
@@ -23,28 +23,35 @@ type SplashScreenProps = {
 
 export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
   const [progress, setProgress] = useState(0)
+  const [visible, setVisible] = useState(false)   // entrance: starts hidden, flips to visible
   const [fadeOut, setFadeOut] = useState(false)
   const rafRef = useRef<number>(0)
   const startRef = useRef<number>(0)
 
+  // Entrance fade-in: flip to visible on first paint
   useEffect(() => {
-    // Animate progress bar from 0 → 100 over `duration` ms
-    const animate = (timestamp: number) => {
-      if (!startRef.current) startRef.current = timestamp
-      const elapsed = timestamp - startRef.current
-      const pct = Math.min((elapsed / duration) * 100, 100)
-      setProgress(pct)
+    const id = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
 
-      if (pct < 100) {
-        rafRef.current = requestAnimationFrame(animate)
-      } else {
-        // Progress done → start fade-out
-        setFadeOut(true)
-      }
+  const animate = useCallback((timestamp: number) => {
+    if (!startRef.current) startRef.current = timestamp
+    const elapsed = timestamp - startRef.current
+    const pct = Math.min((elapsed / duration) * 100, 100)
+    setProgress(pct)
+
+    if (pct < 100) {
+      rafRef.current = requestAnimationFrame(animate)
+    } else {
+      // Progress done → start fade-out
+      setFadeOut(true)
     }
+  }, [duration])
+
+  useEffect(() => {
     rafRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(rafRef.current)
-  }, [duration])
+  }, [animate])
 
   const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     // Only trigger onDone when the root wrapper finishes its opacity fade
@@ -60,9 +67,13 @@ export function SplashScreen({ duration = 2800, onDone }: SplashScreenProps) {
       role="status"
       className="splash-root"
       style={{
-        opacity: fadeOut ? 0 : 1,
-        transition: fadeOut ? 'opacity 0.65s ease-in-out' : 'opacity 0.4s ease-out',
-        pointerEvents: fadeOut ? 'none' : 'all',
+        opacity: fadeOut ? 0 : visible ? 1 : 0,
+        transition: fadeOut
+          ? 'opacity 0.65s ease-in-out'
+          : visible
+            ? 'opacity 0.4s ease-out'
+            : 'none',
+        pointerEvents: fadeOut ? 'none' : 'auto',
       }}
       onTransitionEnd={handleTransitionEnd}
     >
