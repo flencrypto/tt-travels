@@ -430,3 +430,178 @@ blockquote,
   from { width: 0%; }
   to   { width: 100%; }
 }
+
+/* ── Gradient text ──────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg,
+    #D4967A 0%,
+    #B76C7A 40%,
+    #9B7BC7 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Luxury card hover ───────────────────────────────────────────────── */
+.card-luxury {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.card-luxury:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 60px -10px oklch(0.58 0.09 5 / 0.20),
+    0 8px 20px -4px oklch(0.78 0.12 290 / 0.12);
+}
+
+/* ── Shimmer loading animation ───────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg,
+    oklch(0.978 0.013 355) 0%,
+    oklch(0.99 0.005 88) 50%,
+    oklch(0.978 0.013 355) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Hero gradient background ────────────────────────────────────────── */
+.hero-section {
+  background:
+    radial-gradient(ellipse 100% 70% at 50% -10%, oklch(0.78 0.12 290 / 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 0% 100%, oklch(0.80 0.06 20 / 0.20) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 80%, oklch(0.58 0.09 5 / 0.15) 0%, transparent 50%),
+    oklch(0.992 0.007 88);
+}
+
+.dark .hero-section {
+  background:
+    radial-gradient(ellipse 100% 70% at 50% -10%, oklch(0.78 0.12 290 / 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 0% 100%, oklch(0.80 0.06 20 / 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 80%, oklch(0.68 0.09 5 / 0.12) 0%, transparent 50%),
+    oklch(0.20 0.08 305);
+}
+
+/* ── Animated gradient border ────────────────────────────────────────── */
+.border-gradient {
+  position: relative;
+}
+
+.border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, oklch(0.58 0.09 5), oklch(0.78 0.12 290));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Feature icon container ──────────────────────────────────────────── */
+.feature-icon {
+  background: linear-gradient(135deg,
+    oklch(0.58 0.09 5 / 0.15) 0%,
+    oklch(0.78 0.12 290 / 0.10) 100%
+  );
+  border: 1px solid oklch(0.58 0.09 5 / 0.20);
+}
+
+/* ── Journal entry card ──────────────────────────────────────────────── */
+.journal-card {
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.journal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px -12px oklch(0.39 0.11 308 / 0.18);
+}
+
+/* ── Section label / eyebrow ─────────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* ── Floating badge ──────────────────────────────────────────────────── */
+.floating-badge {
+  animation: floatBadge 3s ease-in-out infinite;
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ── Bottom mobile nav ───────────────────────────────────────────────── */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  background: oklch(from var(--card) l c h / 0.92);
+  border-top: 1px solid oklch(from var(--border) l c h / 0.50);
+}
+
+/* ── Tagline / quote style ───────────────────────────────────────────── */
+.travel-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ── Active nav indicator ────────────────────────────────────────────── */
+.nav-active-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── Destination image overlay ───────────────────────────────────────── */
+.destination-overlay {
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    oklch(0.15 0.05 305 / 0.70) 80%,
+    oklch(0.10 0.05 305 / 0.85) 100%
+  );
+}
+
+/* ── Weather card gradient ───────────────────────────────────────────── */
+.weather-sunny {
+  background: linear-gradient(135deg, #F6D365 0%, #FDA085 100%);
+}
+.weather-cloudy {
+  background: linear-gradient(135deg, #89F7FE 0%, #66A6FF 100%);
+}
+.weather-rainy {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+.weather-snowy {
+  background: linear-gradient(135deg, #E3FDF5 0%, #FFE6FA 100%);
+}
+.weather-night {
+  background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+}
