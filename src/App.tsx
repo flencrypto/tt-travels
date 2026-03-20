@@ -46,7 +46,7 @@ function App() {
             <div className="min-h-screen bg-background">
               <Navigation />
               <main>
-                <div className="container mx-auto px-4 py-6">
+                <div className="container mx-auto px-4 py-6 pb-20 md:pb-6">
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/setup" element={<Setup />} />
