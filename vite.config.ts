@@ -93,28 +93,6 @@ export default defineConfig({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         launch_handler: { client_mode: ["navigate-existing", "auto"] } as any,
 
-        // Allows other apps / the OS share sheet to send content to TTs Travels.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        share_target: {
-          action: base,
-          method: "GET",
-          params: { title: "title", text: "text", url: "url" },
-        } as any,
-
-        // Registers a custom URL protocol so deep-links like
-        // web+ttstravels://destination/paris open the app directly.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        protocol_handlers: [
-          { protocol: "web+ttstravels", url: `${base}?url=%s` },
-        ] as any,
-
-        // Allows the app to be the default handler for plain-text travel files
-        // (e.g. exported itineraries).
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        file_handlers: [
-          { action: base, accept: { "text/plain": [".txt"] } },
-        ] as any,
-
         // Progressive enhancement for display: prefer window-controls-overlay
         // (title bar canvas), fall back to standalone → minimal-ui.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
