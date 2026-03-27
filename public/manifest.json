@@ -1,60 +1,60 @@
 {
-  "name": "TT Travels – Your Travel Companion",
-  "short_name": "TT Travels",
+  "name": "TTs Travels – Curated Journeys · Effortlessly Beautiful",
+  "short_name": "TTs Travels",
   "description": "Plan and organise your travels with AI-powered recommendations, flight search, and itinerary planning.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#09090b",
-  "theme_color": "#6366f1",
+  "background_color": "#2a1a32",
+  "theme_color": "#B76C7A",
   "lang": "en",
   "categories": ["travel", "lifestyle"],
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
+      "src": "./icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-96x96.png",
+      "src": "./icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-128x128.png",
+      "src": "./icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-144x144.png",
+      "src": "./icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-152x152.png",
+      "src": "./icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "./icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-384x384.png",
+      "src": "./icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "./icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -65,17 +65,16 @@
       "name": "Explore Destinations",
       "short_name": "Explore",
       "description": "Browse travel destinations",
-      "url": "explore",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "url": "./explore",
+      "icons": [{ "src": "./icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "AI Planner",
       "short_name": "Planner",
       "description": "Plan your trip with AI",
-      "url": "ai-planner",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "url": "./ai-planner",
+      "icons": [{ "src": "./icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
-  "screenshots": [],
   "prefer_related_applications": false
 }
