@@ -17,7 +17,6 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => cache.addAll(OFFLINE_FALLBACKS)),
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -30,7 +29,6 @@ self.addEventListener('activate', (event) => {
       ),
     ),
   );
-  self.clients.claim();
 });
 
 const isNavigationRequest = (request) => request.mode === 'navigate';
@@ -50,22 +48,28 @@ self.addEventListener('fetch', (event) => {
   if (isApiRequest(request.url)) {
     event.respondWith(
       caches.open(API_CACHE).then(async (cache) => {
-        try {
-          const networkResponse = await fetch(request);
+        const cachedResponse = await cache.match(request);
+        const networkFetch = fetch(request).then((networkResponse) => {
           if (networkResponse.ok) {
             cache.put(request, networkResponse.clone());
           }
           return networkResponse;
-        } catch {
-          const cachedResponse = await cache.match(request);
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          return new Response(JSON.stringify({ error: 'Offline and no cached API response available.' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json' },
-          });
+        }).catch(() => null);
+
+        if (cachedResponse) {
+          // Stale-while-revalidate: return cached immediately, update in background
+          networkFetch.catch(() => {});
+          return cachedResponse;
         }
+
+        const networkResponse = await networkFetch;
+        if (networkResponse) {
+          return networkResponse;
+        }
+        return new Response(JSON.stringify({ error: 'Offline and no cached API response available.' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }),
     );
     return;
@@ -97,7 +101,7 @@ self.addEventListener('fetch', (event) => {
           caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, responseClone));
           return networkResponse;
         })
-        .catch(() => caches.open(STATIC_CACHE).then((cache) => cache.match('./index.html')));
+        .catch(() => Response.error());
     }),
   );
 });
